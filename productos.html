@@ -157,15 +157,8 @@ footer{background:var(--gris);border-top:1px solid var(--borde);padding:2rem 2.5
     <div class="page-tag">Marketplace rural · GeoOrigen</div>
     <h1 class="page-title">Productos del <em>campo</em></h1>
     <p class="page-sub">Directamente de los productores al consumidor. Miel, café, lácteos, frutas y más — con trazabilidad de origen garantizada.</p>
-    <div class="cat-tabs">
-      <button class="cat-tab active" onclick="setCat('todos',this)">Todos</button>
-      <button class="cat-tab" onclick="setCat('miel',this)">Miel</button>
-      <button class="cat-tab" onclick="setCat('cafe',this)">Café</button>
-      <button class="cat-tab" onclick="setCat('lacteos',this)">Lácteos</button>
-      <button class="cat-tab" onclick="setCat('frutas',this)">Frutas</button>
-      <button class="cat-tab" onclick="setCat('platano',this)">Plátano</button>
-      <button class="cat-tab" onclick="setCat('hortalizas',this)">Hortalizas</button>
-      <button class="cat-tab" onclick="setCat('procesados',this)">Artesanales</button>
+    <div class="cat-tabs" id="catTabs">
+      <!-- generadas dinámicamente al cargar datos -->
     </div>
   </div>
 </div>
@@ -259,6 +252,27 @@ const CAT_LABELS = {
 let allProducts = [];
 let currentCat = 'todos';
 
+// ── Orden preferido de categorías ────────────────────────────────────────────
+const CAT_ORDER = ['miel','cafe','lacteos','frutas','platano','hortalizas','procesados','otro'];
+
+// ── Construir pestañas solo con las categorías que tienen productos ────────────
+function buildCatTabs() {
+  const container = document.getElementById('catTabs');
+  const catsInData = [...new Set(allProducts.map(p => p.categoria).filter(Boolean))];
+  // Ordenar según el orden canónico; las desconocidas van al final
+  catsInData.sort((a, b) => {
+    const ia = CAT_ORDER.indexOf(a); const ib = CAT_ORDER.indexOf(b);
+    return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+  });
+  const btns = [`<button class="cat-tab active" onclick="setCat('todos',this)">Todos</button>`];
+  catsInData.forEach(cat => {
+    const label = CAT_LABELS[cat] || cat;
+    btns.push(`<button class="cat-tab" onclick="setCat('${cat}',this)">${esc(label)}</button>`);
+  });
+  container.innerHTML = btns.join('');
+  currentCat = 'todos'; // reset al reconstruir
+}
+
 async function loadProducts() {
   try {
     const r = await fetch(
@@ -272,6 +286,7 @@ async function loadProducts() {
   } catch (e) {
     allProducts = [];
   }
+  buildCatTabs();
   filterProducts();
 }
 
