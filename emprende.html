@@ -388,7 +388,7 @@ function renderEmpDir(lista) {
   if (!lista.length) { grid.innerHTML = emptyHTML('Emprendedores'); return; }
 
   grid.innerHTML = lista.map(e => {
-    const url    = e.slug ? `https://geoorigen.com/emprendedor/${e.slug}` : `emprendedor.html?id=${e.id}`;
+    const url    = e.slug ? `https://geoorigen.com/emprendedor/${e.slug}` : `https://geoorigen-productos.wilmenrioblanco.workers.dev/emprendedor.html?id=${e.id}`;
     const color  = e.color_primario || '#8FBC5A';
     // Contar productos de este emprendedor
     const nProds = emprendeProd.filter(p => p.emprendedor_id === e.id).length;

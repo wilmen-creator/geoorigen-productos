@@ -396,6 +396,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
               <div id="pfColorSwatch" style="width:36px;height:36px;border-radius:50%;background:#8FBC5A;margin-left:auto;flex-shrink:0;"></div>
             </div>
           </div>
+          <!-- Fondo del catálogo -->
+          <div class="fg">
+            <label class="fl">Fondo del catálogo de productos</label>
+            <div style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;">
+              <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.35rem;">
+                <input type="radio" name="pfFondo" value="oscuro" id="pfFondoOscuro" style="display:none" onchange="previewFondo('oscuro')">
+                <div id="swOscuro" style="width:52px;height:36px;border-radius:8px;background:#1D1D16;border:2px solid var(--menta);transition:border-color .2s;"></div>
+                <span style="font-size:.7rem;color:rgba(250,250,246,.5);">Oscuro</span>
+              </label>
+              <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.35rem;">
+                <input type="radio" name="pfFondo" value="claro" id="pfFondoClaro" style="display:none" onchange="previewFondo('claro')">
+                <div id="swClaro" style="width:52px;height:36px;border-radius:8px;background:#F5F5F0;border:2px solid transparent;transition:border-color .2s;"></div>
+                <span style="font-size:.7rem;color:rgba(250,250,246,.5);">Claro</span>
+              </label>
+              <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.35rem;">
+                <input type="radio" name="pfFondo" value="color" id="pfFondoColor" style="display:none" onchange="previewFondo('color')">
+                <div id="swColor" style="width:52px;height:36px;border-radius:8px;background:linear-gradient(135deg,rgba(143,188,90,.15),#1D1D16);border:2px solid transparent;transition:border-color .2s;"></div>
+                <span style="font-size:.7rem;color:rgba(250,250,246,.5);">Con color</span>
+              </label>
+            </div>
+          </div>
           <!-- Banner -->
           <div class="fg">
             <label class="fl">Foto de portada (banner hero)</label>
@@ -857,6 +878,7 @@ function cargarFormPerfil() {
   const color = emprendedor.color_primario || '#8FBC5A';
   document.getElementById('pfColor').value = color;
   previewColor(color);
+  previewFondo(emprendedor.fondo_catalogo || 'oscuro');
   if (emprendedor.banner_url) {
     const bp = document.getElementById('pfBannerPreview');
     bp.style.backgroundImage = `url('${emprendedor.banner_url}')`;
@@ -868,6 +890,14 @@ function cargarFormPerfil() {
 
 function previewColor(val) {
   document.getElementById('pfColorSwatch').style.background = val;
+}
+
+function previewFondo(val) {
+  ['oscuro','claro','color'].forEach(f => {
+    const sw = document.getElementById('sw' + f.charAt(0).toUpperCase() + f.slice(1));
+    if (sw) sw.style.borderColor = f === val ? 'var(--menta)' : 'transparent';
+  });
+  document.getElementById('pfFondo' + val.charAt(0).toUpperCase() + val.slice(1)).checked = true;
 }
 
 async function subirBanner(event) {
@@ -913,6 +943,7 @@ async function guardarPerfil() {
     facebook: document.getElementById('pfFB').value.trim() || null,
     tiktok: document.getElementById('pfTikTok').value.trim().replace('@','') || null,
     color_primario: color,
+    fondo_catalogo: document.querySelector('input[name="pfFondo"]:checked')?.value || 'oscuro',
   }).eq('id', emprendedor.id);
   if (error) { toast('Error: ' + error.message, 'err'); return; }
   emprendedor.nombre_emprendimiento = nombre;
