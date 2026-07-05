@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Emprendedor — GeoOrigen</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+try {
+  if (typeof navigator !== 'undefined') {
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        request: function(name,optsOrFn,fn){var opts=(optsOrFn&&typeof optsOrFn==='object')?optsOrFn:{};var cb=typeof optsOrFn==='function'?optsOrFn:fn;var fakeLock={name:name,mode:opts.mode||'exclusive'};return cb?Promise.resolve().then(function(){return cb(fakeLock);}):Promise.resolve();},
+        query: function(){return Promise.resolve({held:[],pending:[]});}
+      }, configurable:true, writable:true
+    });
+  }
+} catch(e) {}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--verde:#2D5016;--menta:#8FBC5A;--acento:#E8A020;--negro:#1A1A14;--blanco:#FAFAF6;--gris:#232318;--gris2:#2e2e22;--borde:rgba(143,188,90,0.18);--danger:#E24B4A;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco);min-height:100vh;}
+
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--negro);}
+.login-box{background:var(--gris2);border:1px solid var(--borde);border-radius:14px;padding:2.5rem;width:100%;max-width:400px;}
+.login-logo{font-size:1.4rem;font-weight:500;color:var(--menta);margin-bottom:0.2rem;}
+.login-sub{font-size:0.8rem;color:rgba(250,250,246,0.4);margin-bottom:2rem;}
+.login-err{background:rgba(226,75,74,0.12);border:1px solid rgba(226,75,74,0.3);border-radius:6px;padding:0.6rem 1rem;font-size:0.8rem;color:var(--danger);margin-bottom:1rem;display:none;}
+
+/* LAYOUT */
+#app{display:none;min-height:100vh;display:none;}
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:var(--gris);border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;z-index:100;}
+.tb-logo{font-size:0.95rem;font-weight:500;color:var(--menta);}
+.tb-logo span{color:rgba(250,250,246,0.38);font-size:0.78rem;font-weight:400;margin-left:0.5rem;}
+.tb-user{font-size:0.78rem;color:rgba(250,250,246,0.45);display:flex;align-items:center;gap:1rem;}
+.btn-logout{background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(250,250,246,0.4);padding:0.4rem 0.85rem;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{border-color:var(--danger);color:var(--danger);}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:210px;background:var(--gris);border-right:1px solid var(--borde);display:flex;flex-direction:column;z-index:90;}
+.sb-item{display:flex;align-items:center;gap:0.65rem;padding:0.75rem 1.25rem;font-size:0.83rem;color:rgba(250,250,246,0.5);cursor:pointer;transition:all .2s;border-left:2px solid transparent;}
+.sb-item:hover{color:rgba(250,250,246,0.85);background:rgba(143,188,90,0.06);}
+.sb-item.active{color:var(--menta);border-left-color:var(--menta);background:rgba(143,188,90,0.08);}
+.sb-icon{font-size:1rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--borde);margin:0.5rem 0;}
+
+/* MAIN */
+.main{margin-left:210px;padding-top:56px;min-height:100vh;}
+.page{display:none;padding:2rem;}
+.page.active{display:block;}
+.page-header{margin-bottom:1.5rem;}
+.page-title{font-size:1.25rem;font-weight:500;margin-bottom:0.25rem;}
+.page-sub{font-size:0.8rem;color:rgba(250,250,246,0.4);}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:0.35rem;margin-bottom:1rem;}
+.fl{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,250,246,0.4);}
+.fi,.fsl,.fta{background:rgba(20,20,16,0.8);border:1px solid rgba(143,188,90,0.15);border-radius:6px;padding:0.65rem 0.85rem;color:var(--blanco);font-family:'DM Sans',sans-serif;font-size:0.86rem;outline:none;transition:border-color .2s;width:100%;}
+.fi:focus,.fsl:focus,.fta:focus{border-color:var(--menta);}
+.fi::placeholder,.fta::placeholder{color:rgba(250,250,246,0.2);}
+.fsl option{background:var(--negro);}
+.fta{resize:vertical;min-height:90px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-check{display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-size:0.86rem;color:rgba(250,250,246,0.75);}
+.form-check input{width:16px;height:16px;accent-color:var(--menta);cursor:pointer;}
+.form-hint{font-size:0.72rem;color:rgba(250,250,246,0.3);margin-top:0.2rem;}
+
+/* BUTTONS */
+.btn{padding:0.62rem 1.3rem;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:500;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:0.45rem;}
+.btn-primary{background:var(--menta);color:var(--negro);}
+.btn-primary:hover{background:#a0d068;}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-outline{background:none;border:1px solid var(--borde);color:rgba(250,250,246,0.6);}
+.btn-outline:hover{border-color:var(--menta);color:var(--menta);}
+.btn-danger{background:none;border:1px solid rgba(226,75,74,0.3);color:var(--danger);}
+.btn-danger:hover{background:rgba(226,75,74,0.1);}
+.btn-sm{padding:0.38rem 0.8rem;font-size:0.74rem;}
+
+/* CARD / TABLE */
+.card{background:var(--gris2);border:1px solid var(--borde);border-radius:10px;overflow:hidden;margin-bottom:1rem;}
+.card-head{padding:0.9rem 1.2rem;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center;}
+.card-title{font-size:0.88rem;font-weight:500;}
+.card-body{padding:1.2rem;}
+
+/* PRODUCT LIST */
+.prod-list{display:flex;flex-direction:column;gap:0.75rem;}
+.prod-item{background:var(--gris2);border:1px solid var(--borde);border-radius:10px;display:flex;align-items:center;gap:1rem;padding:0.85rem 1rem;transition:border-color .2s;}
+.prod-item:hover{border-color:rgba(143,188,90,0.3);}
+.prod-thumb{width:60px;height:60px;border-radius:7px;object-fit:cover;background:var(--gris);flex-shrink:0;border:1px solid rgba(143,188,90,0.1);}
+.prod-thumb-ph{width:60px;height:60px;border-radius:7px;background:rgba(143,188,90,0.06);border:1px solid rgba(143,188,90,0.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.prod-info{flex:1;min-width:0;}
+.prod-nombre{font-size:0.9rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prod-meta{font-size:0.74rem;color:rgba(250,250,246,0.4);margin-top:0.15rem;}
+.prod-price{font-size:0.82rem;color:var(--acento);font-weight:500;margin-top:0.2rem;}
+.prod-badge{font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.5rem;border-radius:3px;border:1px solid;display:inline-block;margin-top:0.25rem;}
+.prod-badge.activo{color:#4ade80;border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.08);}
+.prod-badge.inactivo{color:rgba(250,250,246,0.3);border-color:rgba(250,250,246,0.1);}
+.prod-actions{display:flex;gap:0.5rem;flex-shrink:0;}
+
+/* FOTOS */
+.foto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:0.5rem;}
+.foto-slot{aspect-ratio:1;border-radius:8px;border:1.5px dashed rgba(143,188,90,0.25);background:rgba(143,188,90,0.04);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s;}
+.foto-slot:hover{border-color:rgba(143,188,90,0.5);}
+.foto-slot img{width:100%;height:100%;object-fit:cover;border-radius:6px;}
+.foto-slot .foto-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;color:#fff;font-size:0.75rem;display:flex;align-items:center;justify-content:center;z-index:5;}
+.foto-slot .foto-add{font-size:1.8rem;color:rgba(143,188,90,0.3);}
+.foto-slot.loading{pointer-events:none;}
+.foto-slot.loading .foto-add{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.foto-hint{font-size:0.7rem;color:rgba(250,250,246,0.28);margin-bottom:1rem;}
+
+/* MEMBERSHIP ALERT */
+.memb-alert{background:rgba(232,160,32,0.1);border:1px solid rgba(232,160,32,0.3);border-radius:8px;padding:0.85rem 1rem;font-size:0.83rem;color:rgba(232,160,32,0.9);margin-bottom:1.5rem;}
+.memb-exp{background:rgba(226,75,74,0.1);border:1px solid rgba(226,75,74,0.3);border-radius:8px;padding:0.85rem 1rem;font-size:0.83rem;color:var(--danger);margin-bottom:1.5rem;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--gris2);border:1px solid var(--borde);border-radius:10px;padding:1.2rem;}
+.stat-val{font-size:2rem;font-weight:500;line-height:1;color:var(--menta);}
+.stat-label{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,250,246,0.35);margin-top:0.4rem;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--gris);border:1px solid var(--borde);border-radius:8px;padding:0.8rem 1.2rem;font-size:0.84rem;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{border-color:rgba(143,188,90,0.4);color:var(--menta);}
+.toast.err{border-color:rgba(226,75,74,0.4);color:var(--danger);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3.5rem 2rem;color:rgba(250,250,246,0.25);}
+.empty-state .es-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+.empty-state p{font-size:0.86rem;}
+
+/* CONFIRM MODAL */
+.confirm-bg{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;}
+.confirm-bg.open{display:flex;}
+.confirm-box{background:var(--gris2);border:1px solid var(--borde);border-radius:12px;padding:2rem;max-width:380px;width:100%;margin:1rem;}
+.confirm-title{font-size:1rem;font-weight:500;margin-bottom:0.5rem;}
+.confirm-msg{font-size:0.83rem;color:rgba(250,250,246,0.55);margin-bottom:1.5rem;line-height:1.55;}
+.confirm-btns{display:flex;gap:0.75rem;justify-content:flex-end;}
+
+@media(max-width:640px){
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .form-row{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">GeoOrigen <span style="color:var(--menta)">Emprende</span></div>
+    <div class="login-sub">Panel exclusivo para emprendedores</div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="fg"><label class="fl">Correo electrónico</label>
+      <input class="fi" id="loginEmail" type="email" placeholder="tu@correo.com" autocomplete="email"></div>
+    <div class="fg"><label class="fl">Contraseña</label>
+      <input class="fi" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn btn-primary" id="loginBtn" onclick="doLogin()" style="width:100%;justify-content:center;margin-top:0.5rem;">
+      Ingresar al panel
+    </button>
+    <div style="text-align:center;margin-top:1rem;">
+      <a href="#" onclick="mostrarResetPass()" style="font-size:0.75rem;color:rgba(250,250,246,0.35);">¿Olvidaste tu contraseña?</a>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASS -->
+<div id="resetScreen" style="display:none;align-items:center;justify-content:center;min-height:100vh;">
+  <div class="login-box">
+    <div class="login-logo">Recuperar acceso</div>
+    <div class="login-sub">Te enviaremos un correo para restablecer tu contraseña</div>
+    <div class="login-err" id="resetErr"></div>
+    <div class="fg"><label class="fl">Correo electrónico</label>
+      <input class="fi" id="resetEmail" type="email" placeholder="tu@correo.com"></div>
+    <button class="btn btn-primary" onclick="doReset()" style="width:100%;justify-content:center;">Enviar correo</button>
+    <div style="text-align:center;margin-top:1rem;">
+      <a href="#" onclick="volverLogin()" style="font-size:0.75rem;color:rgba(250,250,246,0.35);">← Volver al login</a>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-logo">GeoOrigen <span>Emprende — Panel</span></div>
+    <div class="tb-user">
+      <span id="tbNombre"></span>
+      <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sb-item active" id="sb-dashboard" onclick="nav('dashboard')">
+      <span class="sb-icon">📊</span> Dashboard
+    </div>
+    <div class="sb-item" id="sb-productos" onclick="nav('productos')">
+      <span class="sb-icon">🛍️</span> Mis productos
+    </div>
+    <div class="sb-item" id="sb-nuevo" onclick="nav('nuevo')">
+      <span class="sb-icon">➕</span> Nuevo producto
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-item" id="sb-perfil" onclick="nav('perfil')">
+      <span class="sb-icon">🏪</span> Mi perfil
+    </div>
+    <div class="sb-item" onclick="window.open('emprende.html','_blank')">
+      <span class="sb-icon">🌐</span> Ver en GeoOrigen
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div class="page active" id="p-dashboard">
+      <div class="page-header">
+        <div class="page-title" id="welcomeTitle">Bienvenido</div>
+        <div class="page-sub" id="welcomeSub">Panel de administración de tu emprendimiento</div>
+      </div>
+      <div id="membAlert"></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-val" id="statTotal">—</div><div class="stat-label">Productos publicados</div></div>
+        <div class="stat-card"><div class="stat-val" id="statActivos">—</div><div class="stat-label">Productos activos</div></div>
+        <div class="stat-card"><div class="stat-val" id="statMemb" style="font-size:1rem;padding-top:0.4rem;">—</div><div class="stat-label">Membresía hasta</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Últimos productos</div><button class="btn btn-outline btn-sm" onclick="nav('productos')">Ver todos</button></div>
+        <div class="card-body" id="dashUltimos"><div style="color:rgba(250,250,246,0.3);font-size:0.83rem;">Cargando...</div></div>
+      </div>
+    </div>
+
+    <!-- MIS PRODUCTOS -->
+    <div class="page" id="p-productos">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div class="page-title">Mis productos</div>
+          <div class="page-sub">Gestiona el catálogo de tu emprendimiento</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="nav('nuevo')">+ Nuevo producto</button>
+      </div>
+      <div id="prodList"><div style="color:rgba(250,250,246,0.3);font-size:0.83rem;">Cargando...</div></div>
+    </div>
+
+    <!-- NUEVO / EDITAR PRODUCTO -->
+    <div class="page" id="p-nuevo">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div class="page-title" id="formProdTitulo">Nuevo producto</div>
+          <div class="page-sub">Completa la información del producto</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="nav('productos')">← Cancelar</button>
+      </div>
+
+      <!-- FOTOS -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Fotos del producto</div></div>
+        <div class="card-body">
+          <div class="foto-grid" id="fotoGrid"></div>
+          <div class="foto-hint">Máximo 3 fotos. La primera es la foto principal. Formatos: JPG, PNG, WebP. Tamaño recomendado: cuadrado.</div>
+        </div>
+      </div>
+
+      <!-- INFO BÁSICA -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Información básica</div></div>
+        <div class="card-body">
+          <div class="fg"><label class="fl">Nombre del producto *</label>
+            <input class="fi" id="fpNombre" placeholder="Ej: Cuadro en acrílico personalizado"></div>
+          <div class="form-row">
+            <div class="fg"><label class="fl">Categoría *</label>
+              <select class="fsl" id="fpCat">
+                <option value="">— Selecciona —</option>
+                <option value="detalles">🎁 Detalles y regalos</option>
+                <option value="arte">🎨 Arte y pintura</option>
+                <option value="peluches">🧸 Peluches</option>
+                <option value="termos">☕ Termos y mugs personalizados</option>
+                <option value="decoracion">🕯️ Decoración para el hogar</option>
+                <option value="joyeria">💍 Joyería y accesorios</option>
+                <option value="flores">🌸 Flores y arreglos</option>
+                <option value="eventos">🎉 Decoración para eventos</option>
+                <option value="manualidades">✨ Manualidades</option>
+                <option value="papeleria">📚 Papelería creativa</option>
+                <option value="reposteria">🍰 Repostería y dulces</option>
+                <option value="san_valentin">❤️ San Valentín</option>
+                <option value="dia_madre">👩 Día de la Madre</option>
+                <option value="dia_padre">👨 Día del Padre</option>
+                <option value="navidad">🎄 Navidad</option>
+                <option value="cumpleanos">🎂 Cumpleaños</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Precio (COP)</label>
+              <input class="fi" id="fpPrecio" type="number" min="0" placeholder="Ej: 45000"></div>
+          </div>
+          <div class="fg"><label class="fl">Descripción</label>
+            <textarea class="fta" id="fpDesc" placeholder="Describe el producto: materiales, tamaños, colores disponibles..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- PERSONALIZACIÓN -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Personalización</div></div>
+        <div class="card-body">
+          <div class="fg" style="margin-bottom:0.75rem;">
+            <label class="form-check">
+              <input type="checkbox" id="fpPersonalizable" onchange="togglePersonaliz()">
+              ¿Este producto se puede personalizar?
+            </label>
+          </div>
+          <div id="personalzWrap" style="display:none;">
+            <div class="fg"><label class="fl">¿Qué se puede personalizar?</label>
+              <input class="fi" id="fpQuePersonalizar" placeholder="Ej: Nombre, color, frase, diseño, foto..."></div>
+            <div class="fg"><label class="fl">Tiempo de elaboración</label>
+              <input class="fi" id="fpTiempoElab" placeholder="Ej: 3 a 5 días hábiles"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISPONIBILIDAD Y ENTREGA -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Disponibilidad y entrega</div></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="fg"><label class="fl">Disponibilidad</label>
+              <select class="fsl" id="fpDisponibilidad">
+                <option value="inmediata">⚡ Entrega inmediata</option>
+                <option value="pedido">🔧 Solo bajo pedido</option>
+                <option value="ambas">Inmediata o bajo pedido</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Ciudad de entrega</label>
+              <input class="fi" id="fpCiudad" placeholder="Ej: Medellín, Antioquia"></div>
+          </div>
+          <div class="fg" style="margin-bottom:0.75rem;">
+            <label class="form-check">
+              <input type="checkbox" id="fpEnvios" onchange="toggleEnvios()">
+              ¿Hace envíos a otras ciudades?
+            </label>
+          </div>
+          <div id="enviosWrap" style="display:none;">
+            <div class="fg"><label class="fl">Tiempo estimado de entrega</label>
+              <input class="fi" id="fpTiempoEntrega" placeholder="Ej: 3 a 7 días hábiles"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2rem;">
+        <button class="btn btn-primary" id="btnGuardarProd" onclick="guardarProducto()">💾 Guardar producto</button>
+        <button class="btn btn-outline" onclick="nav('productos')">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- MI PERFIL -->
+    <div class="page" id="p-perfil">
+      <div class="page-header">
+        <div class="page-title">Mi perfil de emprendimiento</div>
+        <div class="page-sub">Esta información aparece en la página pública junto a tus productos</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Información del emprendimiento</div></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="fg"><label class="fl">Nombre del emprendimiento *</label>
+              <input class="fi" id="pfNombre" placeholder="Ej: Creaciones Luna"></div>
+            <div class="fg"><label class="fl">Ciudad</label>
+              <input class="fi" id="pfCiudad" placeholder="Ej: Bogotá, Cundinamarca"></div>
+          </div>
+          <div class="fg"><label class="fl">Breve descripción del negocio</label>
+            <textarea class="fta" id="pfDesc" placeholder="¿Qué haces? ¿Qué te hace especial?" style="min-height:75px;"></textarea></div>
+          <div class="form-row">
+            <div class="fg"><label class="fl">WhatsApp (solo números, con código país)</label>
+              <input class="fi" id="pfWA" placeholder="Ej: 573001234567"></div>
+            <div class="fg"><label class="fl">Logo URL (opcional)</label>
+              <input class="fi" id="pfLogo" placeholder="https://... (enlace a imagen)"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label class="fl">Instagram (solo usuario, sin @)</label>
+              <input class="fi" id="pfIG" placeholder="micuenta"></div>
+            <div class="fg"><label class="fl">Facebook (URL completa, opcional)</label>
+              <input class="fi" id="pfFB" placeholder="https://facebook.com/..."></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="guardarPerfil()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-bg" id="confirmBg">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle">¿Eliminar producto?</div>
+    <div class="confirm-msg" id="confirmMsg">Esta acción no se puede deshacer.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-outline btn-sm" onclick="cerrarConfirm()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="confirmOk" onclick="">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL  = 'https://kubcmjbiaithfvozmdul.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YmNtamJpYWl0aGZ2b3ptZHVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjI0MzAsImV4cCI6MjA4OTE5ODQzMH0.GoT7vRuwEv7P2mJU1hqIzAXnaNdm4ji-DQM-2WU7WOM';
+const sb = supabase.createClient(SUPA_URL, SUPA_ANON);
+
+// ── Estado ─────────────────────────────────────────────────────────────────────
+let emprendedor = null;   // fila de emprendedores
+let misProductos = [];
+let editandoId = null;    // null = nuevo, uuid = editar
+let fotos = [];           // array de URLs (max 3)
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, tipo='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + tipo;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Login / Logout ─────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const btn   = document.getElementById('loginBtn');
+  const err   = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!email || !pass) { err.textContent = 'Ingresa tu correo y contraseña.'; err.style.display='block'; return; }
+  btn.disabled = true; btn.textContent = 'Ingresando...';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Ingresar al panel';
+  if (error) { err.textContent = 'Correo o contraseña incorrectos.'; err.style.display='block'; return; }
+  iniciarApp();
+}
+
+document.getElementById('loginEmail').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  emprendedor = null; misProductos = [];
+}
+
+function mostrarResetPass() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('resetScreen').style.display = 'flex';
+}
+function volverLogin() {
+  document.getElementById('resetScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+async function doReset() {
+  const email = document.getElementById('resetEmail').value.trim();
+  const err = document.getElementById('resetErr');
+  if (!email) { err.textContent='Ingresa tu correo.'; err.style.display='block'; return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+  err.style.display='none';
+  if (error) { err.textContent=error.message; err.style.display='block'; return; }
+  alert('Te enviamos un correo con el enlace para restablecer tu contraseña.');
+  volverLogin();
+}
+
+// ── Iniciar app ────────────────────────────────────────────────────────────────
+async function iniciarApp() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  // Cargar perfil emprendedor
+  const { data, error } = await sb.from('emprendedores').select('*').eq('user_id', user.id).maybeSingle();
+
+  if (!data) {
+    alert('Tu cuenta aún no está configurada por el administrador. Contacta a GeoOrigen.');
+    await sb.auth.signOut();
+    return;
+  }
+
+  emprendedor = data;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('tbNombre').textContent = emprendedor.nombre_emprendimiento;
+
+  cargarProductos();
+  renderDashboard();
+}
+
+// ── Verificar sesión al cargar ─────────────────────────────────────────────────
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) iniciarApp();
+})();
+
+// ── Alerta membresía ───────────────────────────────────────────────────────────
+function renderMembAlert() {
+  const el = document.getElementById('membAlert');
+  if (!emprendedor.membresia_hasta) { el.innerHTML=''; return; }
+  const hasta = new Date(emprendedor.membresia_hasta);
+  const hoy = new Date();
+  const dias = Math.ceil((hasta - hoy) / 86400000);
+  if (dias < 0) {
+    el.innerHTML = `<div class="memb-exp">⚠️ Tu membresía venció el ${hasta.toLocaleDateString('es-CO')}. Tus productos ya no son visibles en GeoOrigen. Contacta al administrador para renovar.</div>`;
+  } else if (dias <= 15) {
+    el.innerHTML = `<div class="memb-alert">⏳ Tu membresía vence en ${dias} día${dias!==1?'s':''} (${hasta.toLocaleDateString('es-CO')}). Contacta a GeoOrigen para renovar.</div>`;
+  } else { el.innerHTML=''; }
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  document.getElementById('welcomeTitle').textContent = '👋 Hola, ' + emprendedor.nombre_emprendimiento;
+  const hasta = emprendedor.membresia_hasta ? new Date(emprendedor.membresia_hasta).toLocaleDateString('es-CO') : 'Sin límite';
+  document.getElementById('statMemb').textContent = hasta;
+  renderMembAlert();
+}
+
+function renderDashboardStats() {
+  const total = misProductos.length;
+  const activos = misProductos.filter(p => p.activo).length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statActivos').textContent = activos;
+  const ultimos = misProductos.slice(0, 3);
+  const el = document.getElementById('dashUltimos');
+  if (!ultimos.length) { el.innerHTML='<div class="empty-state"><div class="es-icon">📦</div><p>Aún no tienes productos. <a href="#" onclick="nav(\'nuevo\')" style="color:var(--menta)">Crea el primero</a></p></div>'; return; }
+  el.innerHTML = '<div class="prod-list">' + ultimos.map(p => prodItemHTML(p)).join('') + '</div>';
+}
+
+// ── Cargar productos ───────────────────────────────────────────────────────────
+async function cargarProductos() {
+  const { data } = await sb.from('emprende_productos').select('*').eq('emprendedor_id', emprendedor.id).order('creado_en', { ascending: false });
+  misProductos = data || [];
+  renderProdList();
+  renderDashboardStats();
+}
+
+// ── Render lista ───────────────────────────────────────────────────────────────
+function prodItemHTML(p) {
+  const CAT = {detalles:'🎁 Detalles',arte:'🎨 Arte',peluches:'🧸 Peluches',termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',papeleria:'📚 Papelería',reposteria:'🍰 Repostería',san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'};
+  const precio = p.precio ? '$' + Number(p.precio).toLocaleString('es-CO') : 'Sin precio';
+  return `<div class="prod-item">
+    ${p.foto_principal_url ? `<img class="prod-thumb" src="${p.foto_principal_url}" alt="${p.nombre}">` : `<div class="prod-thumb-ph">📦</div>`}
+    <div class="prod-info">
+      <div class="prod-nombre">${p.nombre}</div>
+      <div class="prod-meta">${CAT[p.categoria]||p.categoria||'Sin categoría'}</div>
+      <div class="prod-price">${precio}</div>
+      <span class="prod-badge ${p.activo?'activo':'inactivo'}">${p.activo?'Activo':'Inactivo'}</span>
+    </div>
+    <div class="prod-actions">
+      <button class="btn btn-outline btn-sm" onclick="editarProd('${p.id}')">✏️ Editar</button>
+      <button class="btn btn-outline btn-sm" onclick="toggleActivo('${p.id}',${p.activo})">${p.activo?'Desactivar':'Activar'}</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmarEliminar('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+function renderProdList() {
+  const el = document.getElementById('prodList');
+  if (!misProductos.length) {
+    el.innerHTML = '<div class="empty-state"><div class="es-icon">🛍️</div><p>Aún no tienes productos publicados.<br><a href="#" onclick="nav(\'nuevo\')" style="color:var(--menta)">Agrega tu primer producto</a></p></div>';
+    return;
+  }
+  el.innerHTML = '<div class="prod-list">' + misProductos.map(p => prodItemHTML(p)).join('') + '</div>';
+}
+
+// ── Toggle activo ──────────────────────────────────────────────────────────────
+async function toggleActivo(id, activo) {
+  const { error } = await sb.from('emprende_productos').update({ activo: !activo }).eq('id', id).eq('emprendedor_id', emprendedor.id);
+  if (error) { toast('Error: ' + error.message, 'err'); return; }
+  toast(activo ? 'Producto desactivado' : 'Producto activado');
+  cargarProductos();
+}
+
+// ── Confirmar eliminar ─────────────────────────────────────────────────────────
+let pendingDelete = null;
+function confirmarEliminar(id, nombre) {
+  pendingDelete = id;
+  document.getElementById('confirmMsg').textContent = `¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`;
+  document.getElementById('confirmBg').classList.add('open');
+}
+function cerrarConfirm() { document.getElementById('confirmBg').classList.remove('open'); pendingDelete=null; }
+document.getElementById('confirmOk').onclick = async function() {
+  if (!pendingDelete) return;
+  const { error } = await sb.from('emprende_productos').delete().eq('id', pendingDelete).eq('emprendedor_id', emprendedor.id);
+  cerrarConfirm();
+  if (error) { toast('Error al eliminar', 'err'); return; }
+  toast('Producto eliminado');
+  cargarProductos();
+};
+
+// ── Fotos ─────────────────────────────────────────────────────────────────────
+function renderFotoGrid() {
+  const grid = document.getElementById('fotoGrid');
+  const slots = [];
+  for (let i = 0; i < 3; i++) {
+    const url = fotos[i] || null;
+    if (url) {
+      slots.push(`<div class="foto-slot">
+        <img src="${url}" alt="Foto ${i+1}">
+        <button class="foto-del" onclick="quitarFoto(${i})">✕</button>
+      </div>`);
+    } else {
+      slots.push(`<div class="foto-slot" onclick="document.getElementById('fotoInput${i}').click()">
+        <div class="foto-add">+</div>
+        <input id="fotoInput${i}" type="file" accept="image/*" style="display:none" onchange="subirFoto(event,${i})">
+      </div>`);
+    }
+  }
+  grid.innerHTML = slots.join('');
+}
+
+async function subirFoto(event, idx) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const maxMB = 5;
+  if (file.size > maxMB * 1024 * 1024) { toast('La foto no debe superar ' + maxMB + ' MB', 'err'); return; }
+  const slot = document.getElementById('fotoGrid').children[idx];
+  slot.classList.add('loading');
+  slot.querySelector('.foto-add').textContent = '↻';
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${emprendedor.id}/${Date.now()}_${idx}.${ext}`;
+  const { error: upErr } = await sb.storage.from('emprende-fotos').upload(path, file, { upsert: true });
+  slot.classList.remove('loading');
+  if (upErr) { toast('Error al subir foto: ' + upErr.message, 'err'); renderFotoGrid(); return; }
+
+  const { data: { publicUrl } } = sb.storage.from('emprende-fotos').getPublicUrl(path);
+  fotos[idx] = publicUrl;
+  renderFotoGrid();
+}
+
+function quitarFoto(idx) {
+  fotos[idx] = null;
+  // Compactar array (quitar nulos del medio)
+  fotos = fotos.filter(Boolean);
+  renderFotoGrid();
+}
+
+// ── Guardar producto ───────────────────────────────────────────────────────────
+async function guardarProducto() {
+  const nombre = document.getElementById('fpNombre').value.trim();
+  const cat = document.getElementById('fpCat').value;
+  if (!nombre || !cat) { toast('Nombre y categoría son obligatorios', 'err'); return; }
+
+  const fotosValidas = fotos.filter(Boolean);
+  const foto_principal = fotosValidas[0] || null;
+  const galeria = fotosValidas.slice(1);
+
+  const datos = {
+    emprendedor_id: emprendedor.id,
+    nombre,
+    categoria: cat,
+    precio: document.getElementById('fpPrecio').value ? Number(document.getElementById('fpPrecio').value) : null,
+    descripcion: document.getElementById('fpDesc').value.trim() || null,
+    foto_principal_url: foto_principal,
+    galeria_urls: galeria,
+    personalizable: document.getElementById('fpPersonalizable').checked,
+    que_personalizar: document.getElementById('fpQuePersonalizar').value.trim() || null,
+    tiempo_elaboracion: document.getElementById('fpTiempoElab').value.trim() || null,
+    disponibilidad: document.getElementById('fpDisponibilidad').value,
+    ciudad: document.getElementById('fpCiudad').value.trim() || null,
+    hace_envios: document.getElementById('fpEnvios').checked,
+    tiempo_entrega: document.getElementById('fpTiempoEntrega').value.trim() || null,
+    actualizado_en: new Date().toISOString(),
+  };
+
+  const btn = document.getElementById('btnGuardarProd');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  let error;
+  if (editandoId) {
+    ({ error } = await sb.from('emprende_productos').update(datos).eq('id', editandoId).eq('emprendedor_id', emprendedor.id));
+  } else {
+    ({ error } = await sb.from('emprende_productos').insert(datos));
+  }
+
+  btn.disabled = false; btn.textContent = '💾 Guardar producto';
+  if (error) { toast('Error: ' + error.message, 'err'); return; }
+  toast(editandoId ? 'Producto actualizado ✓' : 'Producto publicado ✓');
+  editandoId = null;
+  cargarProductos();
+  nav('productos');
+}
+
+// ── Editar producto ────────────────────────────────────────────────────────────
+function editarProd(id) {
+  const p = misProductos.find(x => x.id === id);
+  if (!p) return;
+  editandoId = id;
+  fotos = [p.foto_principal_url, ...(p.galeria_urls||[])].filter(Boolean).slice(0,3);
+  document.getElementById('formProdTitulo').textContent = 'Editar producto';
+  document.getElementById('fpNombre').value = p.nombre || '';
+  document.getElementById('fpCat').value = p.categoria || '';
+  document.getElementById('fpPrecio').value = p.precio || '';
+  document.getElementById('fpDesc').value = p.descripcion || '';
+  document.getElementById('fpPersonalizable').checked = p.personalizable;
+  document.getElementById('fpQuePersonalizar').value = p.que_personalizar || '';
+  document.getElementById('fpTiempoElab').value = p.tiempo_elaboracion || '';
+  document.getElementById('fpDisponibilidad').value = p.disponibilidad || 'inmediata';
+  document.getElementById('fpCiudad').value = p.ciudad || '';
+  document.getElementById('fpEnvios').checked = p.hace_envios;
+  document.getElementById('fpTiempoEntrega').value = p.tiempo_entrega || '';
+  togglePersonaliz(); toggleEnvios();
+  renderFotoGrid();
+  nav('nuevo');
+}
+
+// Nuevo producto: limpiar form
+function nuevoProductoForm() {
+  editandoId = null; fotos = [];
+  document.getElementById('formProdTitulo').textContent = 'Nuevo producto';
+  ['fpNombre','fpPrecio','fpDesc','fpQuePersonalizar','fpTiempoElab','fpCiudad','fpTiempoEntrega'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('fpCat').value = '';
+  document.getElementById('fpDisponibilidad').value = 'inmediata';
+  document.getElementById('fpPersonalizable').checked = false;
+  document.getElementById('fpEnvios').checked = false;
+  togglePersonaliz(); toggleEnvios();
+  renderFotoGrid();
+}
+
+function togglePersonaliz() {
+  document.getElementById('personalzWrap').style.display = document.getElementById('fpPersonalizable').checked ? '' : 'none';
+}
+function toggleEnvios() {
+  document.getElementById('enviosWrap').style.display = document.getElementById('fpEnvios').checked ? '' : 'none';
+}
+
+// ── Perfil ────────────────────────────────────────────────────────────────────
+function cargarFormPerfil() {
+  if (!emprendedor) return;
+  document.getElementById('pfNombre').value = emprendedor.nombre_emprendimiento || '';
+  document.getElementById('pfCiudad').value = emprendedor.ciudad || '';
+  document.getElementById('pfDesc').value = emprendedor.descripcion || '';
+  document.getElementById('pfWA').value = emprendedor.whatsapp || '';
+  document.getElementById('pfLogo').value = emprendedor.logo_url || '';
+  document.getElementById('pfIG').value = emprendedor.instagram || '';
+  document.getElementById('pfFB').value = emprendedor.facebook || '';
+}
+
+async function guardarPerfil() {
+  const nombre = document.getElementById('pfNombre').value.trim();
+  if (!nombre) { toast('El nombre del emprendimiento es obligatorio', 'err'); return; }
+  const { error } = await sb.from('emprendedores').update({
+    nombre_emprendimiento: nombre,
+    ciudad: document.getElementById('pfCiudad').value.trim() || null,
+    descripcion: document.getElementById('pfDesc').value.trim() || null,
+    whatsapp: document.getElementById('pfWA').value.trim() || null,
+    logo_url: document.getElementById('pfLogo').value.trim() || null,
+    instagram: document.getElementById('pfIG').value.trim().replace('@','') || null,
+    facebook: document.getElementById('pfFB').value.trim() || null,
+  }).eq('id', emprendedor.id);
+  if (error) { toast('Error: ' + error.message, 'err'); return; }
+  emprendedor.nombre_emprendimiento = nombre;
+  document.getElementById('tbNombre').textContent = nombre;
+  toast('Perfil actualizado ✓');
+}
+
+// ── Navegación ────────────────────────────────────────────────────────────────
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('p-' + page).classList.add('active');
+  const sbEl = document.getElementById('sb-' + page);
+  if (sbEl) sbEl.classList.add('active');
+  if (page === 'nuevo') nuevoProductoForm();
+  if (page === 'perfil') cargarFormPerfil();
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

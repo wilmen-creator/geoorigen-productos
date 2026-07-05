@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><link rel="icon" type="image/png" href="https://geoorigen.com/img/logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emprende — GeoOrigen</title>
+<meta name="description" content="Productos del campo y emprendedores locales en Colombia. Artesanías, detalles, arte, repostería y más con identidad de origen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#2D5016;--menta:#8FBC5A;--acento:#E8A020;--negro:#1A1A14;--blanco:#FAFAF6;--gris:#232318;--gris2:#2e2e22;--borde:rgba(143,188,90,0.18);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco);overflow-x:hidden;}
+a,a:visited{color:inherit;text-decoration:none;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0.85rem 2.5rem;background:rgba(26,26,20,0.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--borde);}
+.nav-logo{display:flex;align-items:center;}.nav-logo img{height:36px;width:auto;display:block;}
+.nav-links{display:flex;align-items:center;gap:1.75rem;}
+.nav-link{font-size:0.73rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,250,246,0.48);transition:color .2s;}
+.nav-link:hover,.nav-link.active{color:var(--blanco);}
+.nav-cta{font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;background:var(--menta);color:var(--blanco);padding:0.5rem 1.2rem;border-radius:3px;font-weight:500;transition:background .2s;}
+
+/* PAGE HEADER */
+.page-header{padding:7.5rem 2.5rem 2rem;border-bottom:1px solid var(--borde);background:linear-gradient(to bottom,rgba(45,80,22,0.06),transparent);}
+.page-header-inner{max-width:1100px;margin:0 auto;}
+.page-tag{font-size:0.63rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--menta);margin-bottom:0.55rem;}
+.page-title{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;line-height:1.15;margin-bottom:0.5rem;}
+.page-title em{color:var(--menta);font-style:italic;}
+.page-sub{font-size:0.88rem;color:rgba(250,250,246,0.42);max-width:520px;line-height:1.6;margin-bottom:1.75rem;}
+
+/* SECTION TABS */
+.sec-tabs{display:flex;gap:0.35rem;margin-bottom:1.25rem;}
+.sec-tab{font-size:0.78rem;font-weight:500;padding:0.55rem 1.3rem;border-radius:5px;border:1px solid var(--borde);color:rgba(250,250,246,0.45);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;gap:0.5rem;}
+.sec-tab:hover{border-color:rgba(143,188,90,0.4);color:rgba(250,250,246,0.8);}
+.sec-tab.active{background:rgba(143,188,90,0.12);border-color:rgba(143,188,90,0.5);color:var(--menta);}
+
+/* CATEGORY TABS */
+.cat-tabs{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.cat-tab{font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.42rem 0.9rem;border-radius:3px;border:1px solid var(--borde);color:rgba(250,250,246,0.42);background:transparent;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.cat-tab:hover,.cat-tab.active{background:rgba(143,188,90,0.12);border-color:rgba(143,188,90,0.4);color:var(--menta);}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:2.5rem;}
+
+/* FILTERS */
+.filters{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.filter-input,.filter-select{background:var(--gris2);border:1px solid var(--borde);border-radius:5px;padding:0.62rem 1rem;color:var(--blanco);font-family:'DM Sans',sans-serif;font-size:0.84rem;outline:none;transition:border-color .2s;}
+.filter-input{flex:1;min-width:220px;}
+.filter-input::placeholder{color:rgba(250,250,246,0.28);}
+.filter-input:focus,.filter-select:focus{border-color:rgba(143,188,90,0.4);}
+.filter-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(143,188,90,0.5)'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.75rem center;background-color:var(--gris2);cursor:pointer;min-width:200px;}
+.filter-select option{background:var(--gris2);}
+.results-info{font-size:0.76rem;color:rgba(250,250,246,0.32);margin-bottom:1.5rem;}
+.results-info span{color:var(--menta);}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.25rem;}
+
+/* CARD */
+.card{background:var(--gris2);border:1px solid var(--borde);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .3s,transform .3s;}
+.card:hover{border-color:rgba(143,188,90,0.42);transform:translateY(-3px);}
+.card-thumb{height:190px;background:linear-gradient(135deg,#1c340f,#2d5016);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.card-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.card:hover .card-thumb img{transform:scale(1.04);}
+.card-thumb-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,26,20,0.72),transparent 60%);}
+.card-cat{position:absolute;top:0.7rem;left:0.7rem;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;background:rgba(26,26,20,0.88);border:1px solid rgba(143,188,90,0.3);border-radius:2px;padding:0.18rem 0.55rem;color:var(--menta);}
+.card-dest{position:absolute;top:0.7rem;right:0.7rem;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;background:rgba(232,160,32,0.2);border:1px solid rgba(232,160,32,0.5);border-radius:2px;padding:0.18rem 0.5rem;color:var(--acento);}
+.card-body{padding:1rem 1.1rem 1.1rem;}
+.card-nombre{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:0.22rem;line-height:1.3;}
+.card-prod{font-size:0.74rem;color:rgba(250,250,246,0.4);margin-bottom:0.55rem;display:flex;align-items:center;gap:0.3rem;}
+.card-prod svg{stroke:currentColor;fill:none;flex-shrink:0;width:11px;height:11px;}
+.card-precio{font-size:0.85rem;color:var(--acento);font-weight:500;margin-bottom:0.65rem;}
+.pres-wrap{display:flex;flex-wrap:wrap;gap:0.28rem;}
+.pres-pill{font-size:0.59rem;letter-spacing:0.05em;border:1px solid var(--borde);border-radius:2px;padding:0.1rem 0.42rem;color:rgba(250,250,246,0.42);}
+.emprende-badge{position:absolute;bottom:0.6rem;left:0.7rem;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;background:rgba(232,160,32,0.18);border:1px solid rgba(232,160,32,0.35);border-radius:2px;padding:0.18rem 0.5rem;color:var(--acento);}
+
+/* EMPTY & SKELETON */
+.empty{text-align:center;padding:5rem 2rem;color:rgba(250,250,246,0.22);grid-column:1/-1;}
+.empty svg{stroke:rgba(143,188,90,0.15);fill:none;display:block;margin:0 auto 1.2rem;}
+.empty p{font-size:0.86rem;line-height:1.7;}
+.skeleton{background:linear-gradient(90deg,var(--gris2) 25%,rgba(255,255,255,0.05) 50%,var(--gris2) 75%);background-size:200%;animation:shimmer 1.4s infinite;border-radius:10px;height:290px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* DETAIL MODAL */
+.modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(8,8,6,0.93);align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--gris);border:1px solid var(--borde);border-radius:14px;width:100%;max-width:820px;margin:auto;position:relative;overflow:hidden;}
+.modal-hero{height:270px;background:linear-gradient(135deg,#1c340f,#2d5016);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.modal-hero img{width:100%;height:100%;object-fit:cover;}
+.modal-hero-ph{opacity:0.12;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:rgba(26,26,20,0.88);border:1px solid rgba(255,255,255,0.15);border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(250,250,246,0.6);font-size:1rem;z-index:10;transition:all .2s;}
+.modal-close:hover{color:var(--blanco);border-color:rgba(143,188,90,0.4);}
+.modal-body{padding:1.75rem 2rem 2rem;}
+.modal-cat-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;flex-wrap:wrap;}
+.modal-cat-badge{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;background:rgba(143,188,90,0.1);border:1px solid rgba(143,188,90,0.28);border-radius:2px;padding:0.18rem 0.6rem;color:var(--menta);}
+.modal-dest-badge{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.35);border-radius:2px;padding:0.18rem 0.55rem;color:var(--acento);}
+.modal-nombre{font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.2;margin-bottom:0.3rem;}
+.modal-prod{font-size:0.82rem;color:rgba(250,250,246,0.42);margin-bottom:1.1rem;display:flex;align-items:center;gap:0.4rem;}
+.modal-prod svg{stroke:currentColor;fill:none;width:13px;height:13px;}
+.modal-desc{font-size:0.88rem;color:rgba(250,250,246,0.65);line-height:1.7;margin-bottom:1.5rem;border-left:2px solid rgba(143,188,90,0.2);padding-left:1rem;}
+.section-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(250,250,246,0.28);margin-bottom:0.75rem;}
+.pres-table{width:100%;border-collapse:collapse;margin-bottom:1.75rem;font-size:0.84rem;}
+.pres-table th{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,250,246,0.28);text-align:left;padding:0.38rem 0.8rem;border-bottom:1px solid var(--borde);}
+.pres-table td{padding:0.55rem 0.8rem;border-bottom:1px solid rgba(143,188,90,0.05);}
+.pres-table tr:last-child td{border-bottom:none;}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;}
+.dot-si{background:var(--menta);}.dot-no{background:rgba(250,250,246,0.18);}
+.precio-cell{color:var(--acento);font-weight:500;}
+
+/* DETAIL — emprendedor rows */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1.5rem;margin-bottom:1.5rem;font-size:0.84rem;}
+.detail-item .di-label{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,250,246,0.28);margin-bottom:0.2rem;}
+.detail-item .di-val{color:rgba(250,250,246,0.75);}
+.emprendedor-box{background:rgba(143,188,90,0.05);border:1px solid rgba(143,188,90,0.15);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem;}
+.emp-logo{width:48px;height:48px;border-radius:50%;border:1px solid rgba(143,188,90,0.2);object-fit:cover;background:var(--gris2);flex-shrink:0;}
+.emp-logo-ph{width:48px;height:48px;border-radius:50%;background:rgba(143,188,90,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.3rem;}
+.emp-info{flex:1;min-width:0;}
+.emp-nombre{font-size:0.9rem;font-weight:500;margin-bottom:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.emp-ciudad{font-size:0.74rem;color:rgba(250,250,246,0.38);}
+.emp-socials{display:flex;gap:0.5rem;margin-top:0.4rem;}
+.emp-social-link{font-size:0.65rem;color:rgba(250,250,246,0.38);padding:0.15rem 0.5rem;border:1px solid rgba(255,255,255,0.08);border-radius:3px;transition:all .2s;}
+.emp-social-link:hover{border-color:var(--menta);color:var(--menta);}
+
+/* GALERÍA en modal */
+.galeria-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1.5rem;}
+.galeria-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid rgba(143,188,90,0.1);transition:border-color .2s;}
+.galeria-grid img:hover{border-color:var(--menta);}
+
+/* CTA BUTTONS */
+.modal-cta{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.25rem;}
+.btn-wa{display:inline-flex;align-items:center;gap:0.5rem;background:#25D366;border:none;border-radius:5px;padding:0.72rem 1.4rem;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;transition:background .2s;text-decoration:none;}
+.btn-wa:hover{background:#1dbd5a;}
+.btn-sec{display:inline-flex;align-items:center;gap:0.4rem;background:transparent;border:1px solid var(--borde);border-radius:5px;padding:0.72rem 1.25rem;color:rgba(250,250,246,0.6);font-family:'DM Sans',sans-serif;font-size:0.84rem;cursor:pointer;transition:all .2s;text-decoration:none;}
+.btn-sec:hover{border-color:rgba(143,188,90,0.4);color:var(--menta);}
+
+/* FOOTER */
+footer{background:var(--gris);border-top:1px solid var(--borde);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:4rem;}
+.footer-logo img{height:52px;width:auto;display:block;}
+.footer-links{display:flex;gap:1.5rem;}
+.footer-link{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(250,250,246,0.28);transition:color .2s;}
+.footer-link:hover{color:var(--menta);}
+.footer-copy{font-size:0.65rem;color:rgba(250,250,246,0.18);}
+
+/* HAMBURGER */
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;z-index:310;}
+.hamburger span{display:block;width:23px;height:2px;background:var(--blanco);border-radius:2px;transition:transform .3s,opacity .3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+@media(max-width:768px){
+  nav{padding:0.75rem 1.25rem;}
+  .hamburger{display:flex;}
+  .nav-links{display:none;position:fixed;top:60px;left:0;right:0;flex-direction:column;background:rgba(26,26,20,0.98);backdrop-filter:blur(14px);border-bottom:1px solid var(--borde);padding:0.75rem;gap:0.25rem;z-index:299;}
+  .nav-links.open{display:flex;}
+  .nav-link{padding:0.75rem 1rem;border-radius:4px;font-size:0.82rem;}
+  .page-header{padding:6.5rem 1.25rem 2rem;}
+  .page-title{font-size:1.9rem;}
+  .main{padding:1.5rem 1.25rem;}
+  .modal-body{padding:1.25rem 1.25rem 1.5rem;}
+  .modal-nombre{font-size:1.4rem;}
+  .modal-cta{flex-direction:column;}
+  .detail-grid{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:1rem;text-align:center;}
+  .footer-links{justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://geoorigen.com" class="nav-logo"><img src="https://geoorigen.com/img/logo-blanco.png" alt="GeoOrigen"></a>
+  <div class="nav-links" id="navLinks">
+    <a href="https://geoorigen.com" class="nav-link">Inicio</a>
+    <a href="https://geoorigen.com/servicios.html" class="nav-link">Servicios</a>
+    <a href="https://geoorigen.com/proyectos.html" class="nav-link">Catálogo</a>
+    <a href="emprende.html" class="nav-link active">Emprende</a>
+    <a href="https://geoorigen-publicaciones.wilmenrioblanco.workers.dev/publicaciones.html" class="nav-link">Voces del campo</a>
+    <a href="https://geoorigen.com/contacto.html" class="nav-cta">Hablemos de tu proyecto</a>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-tag">Marketplace · GeoOrigen</div>
+    <h1 class="page-title"><em>Emprende</em> con GeoOrigen</h1>
+    <p class="page-sub">Productos del campo colombiano y emprendedores locales — directamente a ti, con identidad de origen.</p>
+    <div class="sec-tabs">
+      <button class="sec-tab active" id="tabCampo" onclick="setSection('campo')">🌿 Del Campo</button>
+      <button class="sec-tab" id="tabEmprende" onclick="setSection('emprende')">✨ Emprendedores</button>
+    </div>
+    <div class="cat-tabs" id="catTabs"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="filters" id="filtersWrap">
+    <input class="filter-input" id="searchInput" type="text" placeholder="Buscar por nombre…" oninput="filtrar()">
+    <select class="filter-select" id="depFilter" onchange="filtrar()">
+      <option value="">Todos los departamentos</option>
+      <option>Antioquia</option><option>Bolívar</option><option>Boyacá</option>
+      <option>Caldas</option><option>Cauca</option><option>Córdoba</option>
+      <option>Cundinamarca</option><option>Huila</option><option>Nariño</option>
+      <option>Risaralda</option><option>Santander</option><option>Tolima</option>
+    </select>
+  </div>
+  <div class="results-info" id="resultsInfo">&nbsp;</div>
+  <div class="grid" id="grid">
+    <div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)cerrar()">
+  <div class="modal" id="modal">
+    <div class="modal-hero" id="modalHero">
+      <svg class="modal-hero-ph" width="72" height="72" viewBox="0 0 24 24" stroke="rgba(143,188,90,0.35)" stroke-width="0.8" fill="none"><path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><circle cx="8.5" cy="11" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    </div>
+    <button class="modal-close" onclick="cerrar()">✕</button>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo"><img src="https://geoorigen.com/img/logo-blanco-slogan.png" alt="GeoOrigen"></div>
+  <div class="footer-links">
+    <a href="https://geoorigen.com" class="footer-link">Inicio</a>
+    <a href="https://geoorigen.com/proyectos.html" class="footer-link">Catálogo</a>
+    <a href="https://geoorigen-publicaciones.wilmenrioblanco.workers.dev/publicaciones.html" class="footer-link">Blog</a>
+    <a href="https://geoorigen.com/contacto.html" class="footer-link">Contacto</a>
+  </div>
+  <div class="footer-copy">© 2026 GeoOrigen · Colombia</div>
+</footer>
+
+<script>
+const SUPA_URL = 'https://kubcmjbiaithfvozmdul.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YmNtamJpYWl0aGZ2b3ptZHVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjI0MzAsImV4cCI6MjA4OTE5ODQzMH0.GoT7vRuwEv7P2mJU1hqIzAXnaNdm4ji-DQM-2WU7WOM';
+const H = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Accept': 'application/json' };
+
+function esc(s) { return s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Datos ─────────────────────────────────────────────────────────────────────
+let campoProd = [];
+let emprendeProd = [];
+let seccion = 'campo';
+let catActual = 'todos';
+
+const CAT_CAMPO = { miel:'Miel y Apicultura', cafe:'Café y Derivados', lacteos:'Lácteos y Quesos', frutas:'Frutas', platano:'Plátano y Banano', hortalizas:'Hortalizas', procesados:'Artesanales y Procesados', otro:'Otros' };
+const CAT_CAMPO_ORDER = ['miel','cafe','lacteos','frutas','platano','hortalizas','procesados','otro'];
+
+const CAT_EMP = {
+  detalles:'🎁 Detalles y regalos', arte:'🎨 Arte y pintura', peluches:'🧸 Peluches',
+  termos:'☕ Termos y mugs', decoracion:'🕯️ Decoración para el hogar', joyeria:'💍 Joyería y accesorios',
+  flores:'🌸 Flores y arreglos', eventos:'🎉 Decoración para eventos', manualidades:'✨ Manualidades',
+  papeleria:'📚 Papelería creativa', reposteria:'🍰 Repostería y dulces', san_valentin:'❤️ San Valentín',
+  dia_madre:'👩 Día de la Madre', dia_padre:'👨 Día del Padre', navidad:'🎄 Navidad', cumpleanos:'🎂 Cumpleaños'
+};
+
+// ── Carga ──────────────────────────────────────────────────────────────────────
+async function cargar() {
+  try {
+    const [rc, re] = await Promise.all([
+      fetch(SUPA_URL + '/rest/v1/productos?activa=eq.true&order=destacado.desc,fecha_actualizacion.desc' +
+        '&select=id,slug,nombre,descripcion_corta,descripcion,categoria,foto_portada_url,precio_desde,precio_hasta,unidad_base,nombre_productor,finca_slug,municipio,departamento,whatsapp,presentaciones,destacado', { headers: H }),
+      fetch(SUPA_URL + '/rest/v1/emprende_productos?activo=eq.true&order=creado_en.desc' +
+        '&select=id,nombre,categoria,precio,descripcion,foto_principal_url,galeria_urls,personalizable,que_personalizar,tiempo_elaboracion,disponibilidad,ciudad,hace_envios,tiempo_entrega,emprendedores(nombre_emprendimiento,logo_url,whatsapp,instagram,facebook,ciudad)', { headers: H }),
+    ]);
+    campoProd  = rc.ok  ? await rc.json()  : [];
+    emprendeProd = re.ok ? await re.json() : [];
+  } catch(e) { campoProd = []; emprendeProd = []; }
+  buildCatTabs();
+  filtrar();
+}
+
+// ── Sección ────────────────────────────────────────────────────────────────────
+function setSection(s) {
+  seccion = s;
+  catActual = 'todos';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('depFilter').value = '';
+  document.getElementById('depFilter').style.display = s === 'campo' ? '' : 'none';
+  document.getElementById('tabCampo').classList.toggle('active', s === 'campo');
+  document.getElementById('tabEmprende').classList.toggle('active', s === 'emprende');
+  buildCatTabs();
+  filtrar();
+}
+
+// ── Pestañas de categoría ──────────────────────────────────────────────────────
+function buildCatTabs() {
+  const container = document.getElementById('catTabs');
+  let btns = [`<button class="cat-tab active" onclick="setCat('todos',this)">Todos</button>`];
+  if (seccion === 'campo') {
+    const cats = [...new Set(campoProd.map(p => p.categoria).filter(Boolean))];
+    cats.sort((a,b) => { const ia=CAT_CAMPO_ORDER.indexOf(a),ib=CAT_CAMPO_ORDER.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib); });
+    cats.forEach(c => btns.push(`<button class="cat-tab" onclick="setCat('${esc(c)}',this)">${esc(CAT_CAMPO[c]||c)}</button>`));
+  } else {
+    const cats = [...new Set(emprendeProd.map(p => p.categoria).filter(Boolean))];
+    cats.forEach(c => btns.push(`<button class="cat-tab" onclick="setCat('${esc(c)}',this)">${esc(CAT_EMP[c]||c)}</button>`));
+  }
+  container.innerHTML = btns.join('');
+}
+
+function setCat(cat, btn) {
+  catActual = cat;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtrar();
+}
+
+// ── Filtrado y render ─────────────────────────────────────────────────────────
+function filtrar() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  const dep = document.getElementById('depFilter').value;
+  let lista;
+  if (seccion === 'campo') {
+    lista = campoProd.filter(p => {
+      if (catActual !== 'todos' && p.categoria !== catActual) return false;
+      if (dep && p.departamento !== dep) return false;
+      if (q) { const hay = [p.nombre,p.descripcion_corta,p.nombre_productor,p.municipio].filter(Boolean).join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
+      return true;
+    });
+    renderCampo(lista);
+  } else {
+    lista = emprendeProd.filter(p => {
+      if (catActual !== 'todos' && p.categoria !== catActual) return false;
+      if (q) { const emp = p.emprendedores; const hay = [p.nombre,p.descripcion,emp?.nombre_emprendimiento,emp?.ciudad,p.ciudad].filter(Boolean).join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
+      return true;
+    });
+    renderEmprende(lista);
+  }
+}
+
+// ── Render tarjetas Campo ──────────────────────────────────────────────────────
+function renderCampo(lista) {
+  const grid = document.getElementById('grid');
+  const info = document.getElementById('resultsInfo');
+  info.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}`;
+  if (!lista.length) { grid.innerHTML = emptyHTML('Del campo'); return; }
+  grid.innerHTML = lista.map(p => {
+    const pres = Array.isArray(p.presentaciones) ? p.presentaciones : [];
+    const cat = CAT_CAMPO[p.categoria] || p.categoria || '';
+    const precio = p.precio_desde ? 'Desde $' + Number(p.precio_desde).toLocaleString('es-CO') + (p.unidad_base ? ' / '+p.unidad_base : '') : '';
+    return `<div class="card" onclick="abrirCampo('${esc(p.id)}')">
+      <div class="card-thumb">
+        ${p.foto_portada_url ? `<img src="${esc(p.foto_portada_url)}" alt="${esc(p.nombre)}" loading="lazy">` : thumbPH()}
+        <div class="card-thumb-ov"></div>
+        ${cat?`<div class="card-cat">${esc(cat)}</div>`:''}
+        ${p.destacado?`<div class="card-dest">Destacado</div>`:''}
+      </div>
+      <div class="card-body">
+        <div class="card-nombre">${esc(p.nombre)}</div>
+        <div class="card-prod">${iconUser()} ${esc(p.nombre_productor||'—')}${p.municipio?' · '+esc(p.municipio):''}</div>
+        ${precio?`<div class="card-precio">${esc(precio)}</div>`:'<div style="height:1.1rem"></div>'}
+        <div class="pres-wrap">${pres.slice(0,5).map(pr=>`<span class="pres-pill">${esc(pr.nombre||(pr.cantidad+' '+pr.unidad))}</span>`).join('')}${pres.length>5?`<span class="pres-pill">+${pres.length-5} más</span>`:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render tarjetas Emprendedores ─────────────────────────────────────────────
+function renderEmprende(lista) {
+  const grid = document.getElementById('grid');
+  const info = document.getElementById('resultsInfo');
+  info.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}`;
+  if (!lista.length) { grid.innerHTML = emptyHTML('Emprendedores'); return; }
+  grid.innerHTML = lista.map(p => {
+    const emp = p.emprendedores || {};
+    const cat = CAT_EMP[p.categoria] || p.categoria || '';
+    const precio = p.precio ? '$' + Number(p.precio).toLocaleString('es-CO') : '';
+    const idx = emprendeProd.indexOf(p);
+    return `<div class="card" onclick="abrirEmprende(${idx})">
+      <div class="card-thumb">
+        ${p.foto_principal_url ? `<img src="${esc(p.foto_principal_url)}" alt="${esc(p.nombre)}" loading="lazy">` : thumbPH()}
+        <div class="card-thumb-ov"></div>
+        ${cat?`<div class="card-cat">${esc(cat)}</div>`:''}
+        <div class="emprende-badge">Emprendedor</div>
+      </div>
+      <div class="card-body">
+        <div class="card-nombre">${esc(p.nombre)}</div>
+        <div class="card-prod">${iconUser()} ${esc(emp.nombre_emprendimiento||'—')}${(p.ciudad||emp.ciudad)?' · '+esc(p.ciudad||emp.ciudad):''}</div>
+        ${precio?`<div class="card-precio">${esc(precio)}</div>`:'<div style="height:1.1rem"></div>'}
+        <div class="pres-wrap">
+          ${p.personalizable?`<span class="pres-pill">✎ Personalizable</span>`:''}
+          ${p.disponibilidad==='inmediata'?`<span class="pres-pill">⚡ Entrega inmediata</span>`:p.disponibilidad==='pedido'?`<span class="pres-pill">🔧 Bajo pedido</span>`:`<span class="pres-pill">Inmediata o pedido</span>`}
+          ${p.hace_envios?`<span class="pres-pill">📦 Envíos</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Abrir modal Campo ─────────────────────────────────────────────────────────
+function abrirCampo(id) {
+  const p = campoProd.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalHero').innerHTML = p.foto_portada_url
+    ? `<img src="${esc(p.foto_portada_url)}" alt="${esc(p.nombre)}">`
+    : `<svg class="modal-hero-ph" width="72" height="72" viewBox="0 0 24 24" stroke="rgba(143,188,90,0.3)" stroke-width="0.8" fill="none"><path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><circle cx="8.5" cy="11" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`;
+  const pres = Array.isArray(p.presentaciones) ? p.presentaciones : [];
+  const cat = CAT_CAMPO[p.categoria] || p.categoria || '';
+  const waLink = p.whatsapp ? `https://wa.me/${p.whatsapp}?text=${encodeURIComponent('Hola, me interesa "'+p.nombre+'" que vi en GeoOrigen.')}` : null;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-cat-row">${cat?`<span class="modal-cat-badge">${esc(cat)}</span>`:''} ${p.destacado?`<span class="modal-dest-badge">Destacado</span>`:''}</div>
+    <div class="modal-nombre">${esc(p.nombre)}</div>
+    <div class="modal-prod">${iconUser()} ${esc(p.nombre_productor||'Productor independiente')}${p.municipio?' &middot; '+esc(p.municipio):''}${p.departamento?', '+esc(p.departamento):''}</div>
+    ${p.descripcion||p.descripcion_corta?`<div class="modal-desc">${esc(p.descripcion||p.descripcion_corta)}</div>`:''}
+    ${pres.length?`<div class="section-label">Presentaciones disponibles</div>
+    <table class="pres-table"><thead><tr><th>Presentación</th><th>Cantidad</th><th>Precio</th><th>Estado</th></tr></thead><tbody>
+    ${pres.map(pr=>`<tr><td><strong>${esc(pr.nombre||'')}</strong></td><td>${pr.cantidad!=null?esc(String(pr.cantidad))+' '+esc(pr.unidad||''):esc(pr.unidad||'—')}</td><td class="precio-cell">${pr.precio?'$'+Number(pr.precio).toLocaleString('es-CO'):'—'}</td><td><span class="dot ${pr.disponible!==false?'dot-si':'dot-no'}"></span>${pr.disponible!==false?'Disponible':'No disponible'}</td></tr>`).join('')}
+    </tbody></table>`:''}
+    <div class="modal-cta">
+      ${waLink?`<a class="btn-wa" href="${waLink}" target="_blank" rel="noopener">${iconWA()} Contactar al productor</a>`:''}
+      ${p.finca_slug?`<a class="btn-sec" href="https://geoorigen.com/finca.html?finca=${encodeURIComponent(p.finca_slug)}">${iconHome()} Ver finca de origen</a>`:''}
+    </div>`;
+  abrirModal();
+}
+
+// ── Abrir modal Emprendedor ───────────────────────────────────────────────────
+function abrirEmprende(idx) {
+  const p = emprendeProd[idx];
+  if (!p) return;
+  const emp = p.emprendedores || {};
+  document.getElementById('modalHero').innerHTML = p.foto_principal_url
+    ? `<img src="${esc(p.foto_principal_url)}" alt="${esc(p.nombre)}">`
+    : `<svg class="modal-hero-ph" width="72" height="72" viewBox="0 0 24 24" stroke="rgba(143,188,90,0.3)" stroke-width="0.8" fill="none"><path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><circle cx="8.5" cy="11" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`;
+  const cat = CAT_EMP[p.categoria] || p.categoria || '';
+  const galeria = Array.isArray(p.galeria_urls) ? p.galeria_urls.filter(Boolean) : [];
+  const waLink = emp.whatsapp ? `https://wa.me/${emp.whatsapp}?text=${encodeURIComponent('Hola! Vi tu producto "'+p.nombre+'" en GeoOrigen Emprende y me interesa 😊')}` : null;
+  const dispLabel = p.disponibilidad === 'inmediata' ? '⚡ Entrega inmediata' : p.disponibilidad === 'pedido' ? '🔧 Fabricado bajo pedido' : '⚡ Inmediata o bajo pedido';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-cat-row">
+      ${cat?`<span class="modal-cat-badge">${esc(cat)}</span>`:''}
+      <span class="modal-dest-badge">Emprendedor local</span>
+    </div>
+    <div class="modal-nombre">${esc(p.nombre)}</div>
+    <div class="modal-prod">${iconUser()} ${esc(emp.nombre_emprendimiento||'Emprendedor')}${(p.ciudad||emp.ciudad)?' &middot; '+esc(p.ciudad||emp.ciudad):''}</div>
+    ${p.descripcion?`<div class="modal-desc">${esc(p.descripcion)}</div>`:''}
+    ${galeria.length?`<div class="section-label">Galería</div><div class="galeria-grid">${galeria.map(u=>`<img src="${esc(u)}" alt="Foto" loading="lazy" onclick="window.open('${esc(u)}','_blank')">`).join('')}</div>`:''}
+    <div class="detail-grid">
+      ${p.precio?`<div class="detail-item"><div class="di-label">Precio</div><div class="di-val" style="color:var(--acento);font-size:1.05rem;font-weight:500;">$${Number(p.precio).toLocaleString('es-CO')}</div></div>`:''}
+      <div class="detail-item"><div class="di-label">Disponibilidad</div><div class="di-val">${esc(dispLabel)}</div></div>
+      ${p.tiempo_elaboracion?`<div class="detail-item"><div class="di-label">Tiempo de elaboración</div><div class="di-val">${esc(p.tiempo_elaboracion)}</div></div>`:''}
+      ${p.hace_envios!==null?`<div class="detail-item"><div class="di-label">Envíos</div><div class="di-val">${p.hace_envios?'✅ Sí hace envíos':'📍 Solo entrega local'}</div></div>`:''}
+      ${p.tiempo_entrega?`<div class="detail-item"><div class="di-label">Tiempo de entrega</div><div class="di-val">${esc(p.tiempo_entrega)}</div></div>`:''}
+      ${p.personalizable?`<div class="detail-item"><div class="di-label">Personalización</div><div class="di-val">✎ ${esc(p.que_personalizar||'Sí se puede personalizar')}</div></div>`:''}
+    </div>
+    ${emp.nombre_emprendimiento?`
+    <div class="section-label">El emprendimiento</div>
+    <div class="emprendedor-box">
+      ${emp.logo_url?`<img class="emp-logo" src="${esc(emp.logo_url)}" alt="${esc(emp.nombre_emprendimiento)}">`:`<div class="emp-logo-ph">🌱</div>`}
+      <div class="emp-info">
+        <div class="emp-nombre">${esc(emp.nombre_emprendimiento)}</div>
+        ${emp.ciudad?`<div class="emp-ciudad">📍 ${esc(emp.ciudad)}</div>`:''}
+        <div class="emp-socials">
+          ${emp.instagram?`<a class="emp-social-link" href="https://instagram.com/${esc(emp.instagram)}" target="_blank" rel="noopener">@ Instagram</a>`:''}
+          ${emp.facebook?`<a class="emp-social-link" href="${esc(emp.facebook)}" target="_blank" rel="noopener">Facebook</a>`:''}
+        </div>
+      </div>
+    </div>`:''}
+    <div class="modal-cta">
+      ${waLink?`<a class="btn-wa" href="${waLink}" target="_blank" rel="noopener">${iconWA()} Contactar al emprendedor</a>`:''}
+    </div>`;
+  abrirModal();
+}
+
+function abrirModal() { document.getElementById('modalBg').classList.add('open'); document.body.style.overflow='hidden'; }
+function cerrar() { document.getElementById('modalBg').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', e => { if (e.key==='Escape') cerrar(); });
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function thumbPH() { return `<svg class="modal-hero-ph" style="opacity:0.12" width="52" height="52" viewBox="0 0 24 24" stroke="rgba(143,188,90,0.5)" stroke-width="0.8" fill="none"><path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><circle cx="8.5" cy="11" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`; }
+function iconUser() { return `<svg width="11" height="11" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`; }
+function iconWA() { return `<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.128.558 4.122 1.533 5.853L.072 23.5l5.774-1.517A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 0 1-5.073-1.386l-.363-.214-3.773.99 1.007-3.674-.237-.376A9.952 9.952 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>`; }
+function iconHome() { return `<svg width="13" height="13" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`; }
+function emptyHTML(sec) { return `<div class="empty"><svg width="56" height="56" viewBox="0 0 24 24" stroke-width="1"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><p>No hay productos en esta categoría todavía.</p><small>Pronto habrá más ofertas en ${sec}.</small></div>`; }
+
+// ── Menú hamburguesa ───────────────────────────────────────────────────────────
+function toggleMenu() {
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('navLinks').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  var nav=document.getElementById('navLinks'), btn=document.getElementById('hamburger');
+  if (nav&&nav.classList.contains('open')&&!nav.contains(e.target)&&!btn.contains(e.target)) {
+    nav.classList.remove('open'); btn.classList.remove('open');
+  }
+});
+
+// Ocultar filtro de departamento en sección emprendedores al inicio
+document.getElementById('depFilter').style.display = '';
+cargar();
+</script>
+</body>
+</html>
