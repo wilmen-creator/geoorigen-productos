@@ -443,6 +443,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
                 <div id="swColorIntenso" style="width:56px;height:40px;border-radius:8px;background:#1D1D16;border:2px solid transparent;transition:border-color .2s;"></div>
                 <span style="font-size:.68rem;color:rgba(250,250,246,.5);">Intenso</span>
               </label>
+              <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.3rem;">
+                <input type="radio" name="pfFondo" value="custom" id="pfFondoCustom" style="display:none" onchange="previewFondo('custom')">
+                <div id="swCustom" style="width:56px;height:40px;border-radius:8px;background:conic-gradient(#e74c3c,#f39c12,#2ecc71,#3498db,#9b59b6,#e74c3c);border:2px solid transparent;transition:border-color .2s;"></div>
+                <span style="font-size:.68rem;color:rgba(250,250,246,.5);">Color libre</span>
+              </label>
+            </div>
+            <!-- Panel color personalizado -->
+            <div id="fondoCustomPanel" style="display:none;margin-top:.9rem;padding:.9rem;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.08);">
+              <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:flex-start;">
+                <div>
+                  <div style="font-size:.72rem;color:rgba(250,250,246,.45);margin-bottom:.35rem;">Color principal</div>
+                  <div style="position:relative;width:52px;height:52px;">
+                    <input type="color" id="pfFondoColor1" value="#1D1D16" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer;border:none;" oninput="previewFondoCustom()">
+                    <div id="swFC1" style="width:52px;height:52px;border-radius:8px;background:#1D1D16;border:2px solid rgba(255,255,255,.15);pointer-events:none;"></div>
+                  </div>
+                </div>
+                <div id="gradPanel">
+                  <div style="font-size:.72rem;color:rgba(250,250,246,.45);margin-bottom:.35rem;">Color degradado</div>
+                  <div style="position:relative;width:52px;height:52px;">
+                    <input type="color" id="pfFondoColor2" value="#0A0A08" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer;border:none;" oninput="previewFondoCustom()">
+                    <div id="swFC2" style="width:52px;height:52px;border-radius:8px;background:#0A0A08;border:2px solid rgba(255,255,255,.15);pointer-events:none;"></div>
+                  </div>
+                </div>
+                <div style="align-self:flex-end;padding-bottom:4px;">
+                  <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.78rem;color:rgba(250,250,246,.6);">
+                    <input type="checkbox" id="pfGradCheck" onchange="toggleGrad()" style="width:16px;height:16px;accent-color:var(--menta);">
+                    Degradado
+                  </label>
+                  <select id="pfGradDir" style="display:none;margin-top:.4rem;background:var(--gris2);border:1px solid var(--borde);color:var(--blanco);border-radius:6px;padding:.3rem .5rem;font-size:.75rem;cursor:pointer;" onchange="previewFondoCustom()">
+                    <option value="135deg">↘ Diagonal</option>
+                    <option value="180deg">↓ Vertical</option>
+                    <option value="90deg">→ Horizontal</option>
+                  </select>
+                </div>
+              </div>
+              <div id="fondoCustomPreview" style="margin-top:.75rem;height:36px;border-radius:8px;background:#1D1D16;border:1px solid rgba(255,255,255,.1);"></div>
             </div>
           </div>
           <!-- Banner -->
@@ -473,8 +509,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
           </div>
           <div class="fg"><label class="fl">Descripción del negocio</label>
             <textarea class="fta" id="pfDesc" placeholder="¿Qué haces? ¿Qué te hace especial? ¿Qué ofreces?" style="min-height:85px;"></textarea></div>
-          <div class="fg"><label class="fl">Logo URL (enlace a imagen de tu logo)</label>
-            <input class="fi" id="pfLogo" placeholder="https://..."></div>
+          <div class="fg">
+            <label class="fl">Logo del emprendimiento</label>
+            <div style="display:flex;align-items:center;gap:1rem;margin-top:.35rem;flex-wrap:wrap;">
+              <div id="pfLogoPreview" style="width:72px;height:72px;border-radius:50%;background:var(--gris2);border:2px solid var(--borde);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(250,250,246,.25);font-size:1.5rem;">🏪</div>
+              <div style="display:flex;flex-direction:column;gap:.45rem;">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('logoInput').click()">📷 Subir logo</button>
+                <button class="btn btn-outline btn-sm" id="btnQuitarLogo" style="display:none" onclick="quitarLogo()">✕ Quitar logo</button>
+                <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="subirLogo(event)">
+              </div>
+              <div style="font-size:.7rem;color:rgba(250,250,246,.3);line-height:1.4;">Cuadrada o circular.<br>Recomendado: 400×400 px.</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -899,7 +945,7 @@ function cargarFormPerfil() {
   document.getElementById('pfCiudad').value = emprendedor.ciudad || '';
   document.getElementById('pfDesc').value = emprendedor.descripcion || '';
   document.getElementById('pfWA').value = emprendedor.whatsapp || '';
-  document.getElementById('pfLogo').value = emprendedor.logo_url || '';
+  _setLogoPreview(emprendedor.logo_url || null);
   document.getElementById('pfIG').value = emprendedor.instagram || '';
   document.getElementById('pfFB').value = emprendedor.facebook || '';
   document.getElementById('pfTikTok').value = emprendedor.tiktok || '';
@@ -910,6 +956,23 @@ function cargarFormPerfil() {
   document.getElementById('pfColorMarco').value = colorMarco;
   previewColorMarco(colorMarco);
   previewFondo(emprendedor.fondo_catalogo || 'oscuro');
+  if (emprendedor.fondo_catalogo === 'custom' && emprendedor.fondo_color) {
+    const fc = emprendedor.fondo_color;
+    const isGrad = fc.startsWith('linear-gradient');
+    if (isGrad) {
+      const parts = fc.match(/linear-gradient\(([^,]+),\s*([^,]+),\s*(.+)\)/);
+      if (parts) {
+        document.getElementById('pfGradDir').value = parts[1].trim();
+        document.getElementById('pfFondoColor1').value = parts[2].trim();
+        document.getElementById('pfFondoColor2').value = parts[3].trim();
+        document.getElementById('pfGradCheck').checked = true;
+        document.getElementById('pfGradDir').style.display = 'block';
+      }
+    } else {
+      document.getElementById('pfFondoColor1').value = fc;
+    }
+    previewFondoCustom();
+  }
   if (emprendedor.banner_url) {
     const bp = document.getElementById('pfBannerPreview');
     bp.style.backgroundImage = `url('${emprendedor.banner_url}')`;
@@ -940,7 +1003,7 @@ function _updateGradientSwatches(hex) {
 }
 
 function previewFondo(val) {
-  const ids = ['oscuro','claro','color-suave','color-medio','color-intenso'];
+  const ids = ['oscuro','claro','color-suave','color-medio','color-intenso','custom'];
   ids.forEach(f => {
     const key = 'sw' + f.split('-').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join('');
     const sw = document.getElementById(key);
@@ -949,6 +1012,60 @@ function previewFondo(val) {
   const radioId = 'pfFondo' + val.split('-').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join('');
   const radio = document.getElementById(radioId);
   if (radio) radio.checked = true;
+  document.getElementById('fondoCustomPanel').style.display = val === 'custom' ? 'block' : 'none';
+}
+
+function previewFondoCustom() {
+  const c1 = document.getElementById('pfFondoColor1').value;
+  const c2 = document.getElementById('pfFondoColor2').value;
+  const grad = document.getElementById('pfGradCheck').checked;
+  const dir = document.getElementById('pfGradDir').value;
+  document.getElementById('swFC1').style.background = c1;
+  document.getElementById('swFC2').style.background = c2;
+  const bg = grad ? `linear-gradient(${dir}, ${c1}, ${c2})` : c1;
+  document.getElementById('fondoCustomPreview').style.background = bg;
+}
+
+function toggleGrad() {
+  const on = document.getElementById('pfGradCheck').checked;
+  document.getElementById('pfGradDir').style.display = on ? 'block' : 'none';
+  previewFondoCustom();
+}
+
+async function subirLogo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop();
+  const path = `${emprendedor.id}/logo.${ext}`;
+  const { error: upErr } = await sb.storage.from('emprende-fotos').upload(path, file, { upsert: true });
+  if (upErr) { toast('Error subiendo logo: ' + upErr.message, 'err'); return; }
+  const { data } = sb.storage.from('emprende-fotos').getPublicUrl(path);
+  const url = data.publicUrl + '?t=' + Date.now();
+  emprendedor.logo_url = url;
+  _setLogoPreview(url);
+  await sb.from('emprendedores').update({ logo_url: url }).eq('id', emprendedor.id);
+  toast('Logo actualizado ✓');
+  renderDashboard();
+}
+
+async function quitarLogo() {
+  emprendedor.logo_url = null;
+  _setLogoPreview(null);
+  await sb.from('emprendedores').update({ logo_url: null }).eq('id', emprendedor.id);
+  toast('Logo eliminado');
+  renderDashboard();
+}
+
+function _setLogoPreview(url) {
+  const el = document.getElementById('pfLogoPreview');
+  const btn = document.getElementById('btnQuitarLogo');
+  if (url) {
+    el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+    btn.style.display = 'inline-block';
+  } else {
+    el.innerHTML = '🏪';
+    btn.style.display = 'none';
+  }
 }
 
 async function subirBanner(event) {
@@ -990,13 +1107,22 @@ async function guardarPerfil() {
     ciudad: document.getElementById('pfCiudad').value.trim() || null,
     descripcion: document.getElementById('pfDesc').value.trim() || null,
     whatsapp: document.getElementById('pfWA').value.trim() || null,
-    logo_url: document.getElementById('pfLogo').value.trim() || null,
     instagram: document.getElementById('pfIG').value.trim().replace('@','') || null,
     facebook: document.getElementById('pfFB').value.trim() || null,
     tiktok: document.getElementById('pfTikTok').value.trim().replace('@','') || null,
     color_primario: color,
     color_marco: colorMarco,
     fondo_catalogo: document.querySelector('input[name="pfFondo"]:checked')?.value || 'oscuro',
+    fondo_color: (()=>{
+      const sel = document.querySelector('input[name="pfFondo"]:checked')?.value;
+      if (sel !== 'custom') return null;
+      const c1 = document.getElementById('pfFondoColor1').value;
+      const grad = document.getElementById('pfGradCheck').checked;
+      if (!grad) return c1;
+      const c2 = document.getElementById('pfFondoColor2').value;
+      const dir = document.getElementById('pfGradDir').value;
+      return `linear-gradient(${dir}, ${c1}, ${c2})`;
+    })(),
   }).eq('id', emprendedor.id);
   if (error) { toast('Error: ' + error.message, 'err'); return; }
   emprendedor.nombre_emprendimiento = nombre;

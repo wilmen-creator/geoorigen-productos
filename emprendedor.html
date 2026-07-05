@@ -324,7 +324,12 @@ async function cargar() {
   // Fondo del catálogo
   const fondo = emp.fondo_catalogo || 'oscuro';
   const fondoClases = {'claro':'fondo-claro','color':'fondo-color','color-suave':'fondo-color-suave','color-medio':'fondo-color-medio','color-intenso':'fondo-color-intenso'};
-  if (fondoClases[fondo]) document.body.classList.add(fondoClases[fondo]);
+  if (fondo === 'custom' && emp.fondo_color) {
+    document.querySelector('.catalogo') && (document.querySelector('.catalogo').style.background = emp.fondo_color);
+    document.documentElement.style.setProperty('--cat-bg', emp.fondo_color);
+  } else if (fondoClases[fondo]) {
+    document.body.classList.add(fondoClases[fondo]);
+  }
 
   document.title = `${emp.nombre_emprendimiento} — GeoOrigen Emprende`;
   document.querySelector('meta[name="description"]').content =
