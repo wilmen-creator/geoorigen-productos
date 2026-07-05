@@ -229,6 +229,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
         <div class="stat-card"><div class="stat-val" id="statActivos">—</div><div class="stat-label">Productos activos</div></div>
         <div class="stat-card"><div class="stat-val" id="statMemb" style="font-size:1rem;padding-top:0.4rem;">—</div><div class="stat-label">Membresía hasta</div></div>
       </div>
+      <!-- Enlace compartible -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-head"><div class="card-title">🔗 Tu enlace público</div></div>
+        <div class="card-body">
+          <div style="font-size:0.78rem;color:rgba(250,250,246,0.4);margin-bottom:0.6rem;">Comparte este enlace para que tus clientes vean solo tus productos:</div>
+          <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+            <span id="miEnlace" style="font-size:0.8rem;color:rgba(250,250,246,0.55);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(0,0,0,0.3);padding:0.5rem 0.75rem;border-radius:6px;border:1px solid rgba(143,188,90,0.12);">—</span>
+            <button class="btn btn-outline btn-sm" id="btnCopiarEnlace" onclick="copiarMiEnlace()">Copiar</button>
+            <a id="btnVerEnlace" href="#" target="_blank" class="btn btn-outline btn-sm">Ver página</a>
+          </div>
+        </div>
+      </div>
       <div class="card">
         <div class="card-head"><div class="card-title">Últimos productos</div><button class="btn btn-outline btn-sm" onclick="nav('productos')">Ver todos</button></div>
         <div class="card-body" id="dashUltimos"><div style="color:rgba(250,250,246,0.3);font-size:0.83rem;">Cargando...</div></div>
@@ -514,11 +526,26 @@ function renderMembAlert() {
   } else { el.innerHTML=''; }
 }
 
+// ── Enlace público ────────────────────────────────────────────────────────────
+const BASE_EMP_URL = 'https://geoorigen-productos.wilmenrioblanco.workers.dev/emprendedor.html';
+function miEnlaceUrl() { return `${BASE_EMP_URL}?id=${emprendedor.id}`; }
+function copiarMiEnlace() {
+  navigator.clipboard.writeText(miEnlaceUrl()).then(() => {
+    const btn = document.getElementById('btnCopiarEnlace');
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 function renderDashboard() {
   document.getElementById('welcomeTitle').textContent = '👋 Hola, ' + emprendedor.nombre_emprendimiento;
   const hasta = emprendedor.membresia_hasta ? new Date(emprendedor.membresia_hasta).toLocaleDateString('es-CO') : 'Sin límite';
   document.getElementById('statMemb').textContent = hasta;
+  // Enlace compartible
+  const url = miEnlaceUrl();
+  document.getElementById('miEnlace').textContent = url;
+  document.getElementById('btnVerEnlace').href = url;
   renderMembAlert();
 }
 
