@@ -4,211 +4,287 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Emprendedor — GeoOrigen Emprende</title>
+<meta name="description" content="Conoce este emprendimiento en GeoOrigen Emprende">
 <link rel="icon" href="data:,">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--verde:#2D5016;--menta:#8FBC5A;--acento:#E8A020;--negro:#1A1A14;--blanco:#FAFAF6;--gris:#232318;--gris2:#2e2e22;--borde:rgba(143,188,90,0.18);}
+:root{
+  --c:#8FBC5A;          /* color primario del emprendedor — se sobreescribe con JS */
+  --c-dark:color-mix(in srgb, var(--c) 70%, #000);
+  --c-glow:color-mix(in srgb, var(--c) 25%, transparent);
+  --negro:#0E0E0A;--blanco:#FAFAF6;--gris:#1C1C15;--gris2:#242419;--borde:rgba(255,255,255,0.1);
+}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco);min-height:100vh;}
 
-/* NAV */
-.nav{position:sticky;top:0;z-index:100;background:rgba(26,26,20,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;}
-.nav-logo{font-size:.95rem;font-weight:500;color:var(--menta);text-decoration:none;}
-.nav-logo span{color:rgba(250,250,246,.35);font-size:.78rem;font-weight:400;margin-left:.4rem;}
-.nav-back{font-size:.78rem;color:rgba(250,250,246,.45);text-decoration:none;display:flex;align-items:center;gap:.4rem;transition:color .2s;}
-.nav-back:hover{color:var(--menta);}
+/* ── HERO ── */
+.hero{position:relative;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:2.5rem;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.45);}
+.hero-gradient{position:absolute;inset:0;background:linear-gradient(160deg,var(--c-dark) 0%,transparent 50%,var(--negro) 100%);opacity:.75;}
+.hero-bottom{position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to top,var(--negro),transparent);}
+.hero-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 1.5rem;max-width:680px;margin:0 auto;}
+.hero-logo{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.25);margin-bottom:1.25rem;background:var(--gris2);box-shadow:0 0 0 6px var(--c-glow);}
+.hero-logo-ph{width:100px;height:100px;border-radius:50%;background:var(--c-glow);border:3px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:2.8rem;margin-bottom:1.25rem;box-shadow:0 0 0 6px var(--c-glow);}
+.hero-nombre{font-size:2.1rem;font-weight:600;line-height:1.1;margin-bottom:.5rem;letter-spacing:-.02em;}
+.hero-ciudad{font-size:.82rem;color:rgba(250,250,246,.5);margin-bottom:1rem;display:flex;align-items:center;gap:.35rem;}
+.hero-desc{font-size:.9rem;color:rgba(250,250,246,.7);line-height:1.7;max-width:520px;margin-bottom:1.5rem;}
 
-/* HERO EMPRENDEDOR */
-.emp-hero{background:linear-gradient(135deg,rgba(45,80,22,.35) 0%,rgba(26,26,20,0) 70%);border-bottom:1px solid var(--borde);padding:3rem 2rem 2.5rem;}
-.emp-hero-inner{max-width:900px;margin:0 auto;display:flex;align-items:flex-start;gap:2rem;flex-wrap:wrap;}
-.emp-logo{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid var(--borde);background:var(--gris2);flex-shrink:0;}
-.emp-logo-ph{width:90px;height:90px;border-radius:50%;background:rgba(143,188,90,.1);border:2px solid var(--borde);display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0;}
-.emp-info{flex:1;min-width:0;}
-.emp-nombre{font-size:1.75rem;font-weight:500;line-height:1.15;margin-bottom:.4rem;}
-.emp-ciudad{font-size:.8rem;color:rgba(250,250,246,.4);margin-bottom:.75rem;}
-.emp-desc{font-size:.88rem;color:rgba(250,250,246,.65);line-height:1.65;max-width:580px;margin-bottom:1.1rem;}
-.emp-socials{display:flex;flex-wrap:wrap;gap:.6rem;}
-.soc-btn{display:flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:6px;font-size:.78rem;font-weight:500;text-decoration:none;transition:all .2s;}
-.soc-wa{background:rgba(37,211,102,.12);color:#25d366;border:1px solid rgba(37,211,102,.25);}
-.soc-wa:hover{background:rgba(37,211,102,.22);}
-.soc-ig{background:rgba(228,64,95,.1);color:#e4405f;border:1px solid rgba(228,64,95,.22);}
-.soc-ig:hover{background:rgba(228,64,95,.2);}
-.soc-fb{background:rgba(24,119,242,.1);color:#1877f2;border:1px solid rgba(24,119,242,.22);}
-.soc-fb:hover{background:rgba(24,119,242,.2);}
+/* ── REDES SOCIALES ── */
+.socials{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;}
+.soc{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1rem;border-radius:50px;font-size:.78rem;font-weight:500;text-decoration:none;border:1px solid;transition:all .2s;}
+.soc-wa {color:#25d366;border-color:rgba(37,211,102,.3);background:rgba(37,211,102,.08);}  .soc-wa:hover{background:rgba(37,211,102,.18);}
+.soc-ig {color:#e4405f;border-color:rgba(228,64,95,.3);background:rgba(228,64,95,.08);}    .soc-ig:hover{background:rgba(228,64,95,.18);}
+.soc-fb {color:#1877f2;border-color:rgba(24,119,242,.3);background:rgba(24,119,242,.08);}  .soc-fb:hover{background:rgba(24,119,242,.18);}
+.soc-tk {color:#ff0050;border-color:rgba(255,0,80,.3);background:rgba(255,0,80,.08);}      .soc-tk:hover{background:rgba(255,0,80,.18);}
 
-/* SHARE BOX */
-.share-box{max-width:900px;margin:1.5rem auto 0;background:rgba(143,188,90,.06);border:1px solid var(--borde);border-radius:10px;padding:.85rem 1.2rem;display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;}
-.share-label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(250,250,246,.35);flex-shrink:0;}
-.share-url{font-size:.78rem;color:rgba(250,250,246,.5);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.share-copy{background:none;border:1px solid var(--borde);color:var(--menta);padding:.35rem .85rem;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:.73rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
-.share-copy:hover{background:rgba(143,188,90,.1);}
+/* ── NAV MINI ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(14,14,10,.8),transparent);pointer-events:none;}
+.topbar a{pointer-events:all;font-size:.75rem;color:rgba(250,250,246,.45);text-decoration:none;display:flex;align-items:center;gap:.35rem;transition:color .2s;}
+.topbar a:hover{color:rgba(250,250,246,.8);}
+.topbar-logo{font-size:.8rem;font-weight:500;color:rgba(250,250,246,.3);}
 
-/* PRODUCTOS */
-.section{max-width:900px;margin:0 auto;padding:2rem;}
-.section-title{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,250,246,.3);margin-bottom:1.25rem;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;}
-.card{background:var(--gris2);border:1px solid var(--borde);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;}
-.card:hover{border-color:rgba(143,188,90,.4);transform:translateY(-2px);}
-.card-img{width:100%;height:180px;object-fit:cover;background:var(--gris);display:block;}
-.card-img-ph{width:100%;height:180px;background:rgba(143,188,90,.06);display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+/* ── PRODUCTOS ── */
+.prods{max-width:960px;margin:0 auto;padding:2rem 1.25rem 7rem;}
+.prods-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem;}
+.prods-title{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(250,250,246,.28);}
+.cat-scroll{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.25rem;scrollbar-width:none;}
+.cat-scroll::-webkit-scrollbar{display:none;}
+.cat-btn{flex-shrink:0;padding:.38rem .85rem;border-radius:50px;font-size:.74rem;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(250,250,246,.45);font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
+.cat-btn.on{background:var(--c);color:#000;border-color:var(--c);font-weight:500;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+.card{background:var(--gris2);border:1px solid var(--borde);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .25s,transform .25s;}
+.card:hover{border-color:var(--c);transform:translateY(-3px);}
+.card-img{width:100%;height:190px;object-fit:cover;background:var(--gris);display:block;}
+.card-img-ph{width:100%;height:190px;background:var(--c-glow);display:flex;align-items:center;justify-content:center;font-size:3rem;}
 .card-body{padding:1rem;}
-.card-nombre{font-size:.92rem;font-weight:500;margin-bottom:.35rem;}
-.card-precio{font-size:.85rem;color:var(--acento);margin-bottom:.55rem;}
-.card-pills{display:flex;flex-wrap:wrap;gap:.35rem;}
-.pill{font-size:.6rem;padding:.2rem .55rem;border-radius:3px;border:1px solid rgba(143,188,90,.2);color:rgba(250,250,246,.5);}
-
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem;}
-.modal-bg.open{display:flex;}
-.modal{background:var(--gris2);border:1px solid var(--borde);border-radius:16px;width:100%;max-width:680px;margin:auto;}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--borde);}
-.modal-title{font-size:1rem;font-weight:500;}
-.modal-close{background:none;border:none;color:rgba(250,250,246,.4);font-size:1.3rem;cursor:pointer;line-height:1;}
-.modal-body{padding:1.5rem;}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem;}
-.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:pointer;}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:1.25rem;}
-.dg-item label{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(250,250,246,.35);display:block;margin-bottom:.2rem;}
-.dg-item p{font-size:.86rem;color:rgba(250,250,246,.8);}
-.detail-desc{font-size:.86rem;color:rgba(250,250,246,.65);line-height:1.7;margin-bottom:1.25rem;}
-.wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;background:#25d366;color:#fff;padding:.85rem 1.5rem;border-radius:8px;font-size:.9rem;font-weight:500;text-decoration:none;transition:background .2s;}
-.wa-btn:hover{background:#1ebe5b;}
-
-/* EMPTY / LOADING */
-.empty{text-align:center;padding:4rem 2rem;color:rgba(250,250,246,.22);}
+.card-nombre{font-size:.9rem;font-weight:500;margin-bottom:.35rem;line-height:1.3;}
+.card-precio{font-size:.88rem;color:var(--c);margin-bottom:.5rem;font-weight:500;}
+.card-pills{display:flex;flex-wrap:wrap;gap:.3rem;}
+.pill{font-size:.58rem;padding:.18rem .5rem;border-radius:3px;border:1px solid rgba(255,255,255,.1);color:rgba(250,250,246,.4);}
+.empty{text-align:center;padding:4rem 1rem;color:rgba(250,250,246,.2);}
 .empty-icon{font-size:2.5rem;margin-bottom:.75rem;}
 
-@media(max-width:600px){
-  .emp-hero{padding:2rem 1.25rem 1.75rem;}
-  .emp-nombre{font-size:1.35rem;}
-  .section{padding:1.5rem 1.25rem;}
-  .detail-grid{grid-template-columns:1fr;}
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+@media(min-width:600px){.modal-bg{align-items:center;}}
+.modal{background:var(--gris);border:1px solid var(--borde);border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;}
+@media(min-width:600px){.modal{border-radius:20px;}}
+.modal-img{width:100%;height:240px;object-fit:cover;display:block;}
+.modal-img-ph{width:100%;height:200px;background:var(--c-glow);display:flex;align-items:center;justify-content:center;font-size:4rem;}
+.modal-body{padding:1.5rem;}
+.modal-nombre{font-size:1.15rem;font-weight:600;margin-bottom:.3rem;}
+.modal-precio{font-size:1.1rem;color:var(--c);font-weight:500;margin-bottom:1rem;}
+.modal-desc{font-size:.86rem;color:rgba(250,250,246,.65);line-height:1.75;margin-bottom:1.25rem;}
+.modal-attrs{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.25rem;}
+.attr label{font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(250,250,246,.3);display:block;margin-bottom:.15rem;}
+.attr p{font-size:.82rem;color:rgba(250,250,246,.75);}
+.gallery-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:1.25rem;}
+.gallery-mini img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:pointer;}
+.modal-wa{display:flex;align-items:center;justify-content:center;gap:.6rem;background:#25d366;color:#fff;padding:.9rem 1.5rem;border-radius:10px;font-size:.9rem;font-weight:500;text-decoration:none;transition:background .2s;}
+.modal-wa:hover{background:#1ebe5b;}
+.modal-close-btn{position:sticky;top:0;display:flex;justify-content:flex-end;padding:.75rem 1rem 0;background:var(--gris);}
+.modal-close-btn button{background:rgba(255,255,255,.1);border:none;color:rgba(250,250,246,.6);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+
+/* ── SHARE BUTTON STICKY ── */
+.share-sticky{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:.6rem;}
+.share-btn{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.6rem;border-radius:50px;font-size:.88rem;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
+.share-btn-main{background:var(--c);color:#000;box-shadow:0 4px 20px var(--c-glow);}
+.share-btn-main:hover{filter:brightness(1.1);}
+.share-btn-copy{background:rgba(255,255,255,.1);color:rgba(250,250,246,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);}
+.share-btn-copy:hover{background:rgba(255,255,255,.18);}
+
+/* ── LOADING ── */
+.loader{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:1rem;}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--c);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:480px){
+  .hero-nombre{font-size:1.6rem;}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));}
+  .modal-attrs{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a href="emprende.html" class="nav-logo">GeoOrigen <span>Emprende</span></a>
-  <a href="emprende.html" class="nav-back">← Ver todos los emprendedores</a>
-</nav>
+<div class="topbar">
+  <a href="emprende.html">← GeoOrigen Emprende</a>
+  <span class="topbar-logo">GeoOrigen</span>
+</div>
 
-<!-- HERO (se llena con JS) -->
-<div class="emp-hero" id="heroWrap" style="display:none">
-  <div class="emp-hero-inner">
-    <div id="heroLogo"></div>
-    <div class="emp-info">
-      <div class="emp-nombre" id="heroNombre"></div>
-      <div class="emp-ciudad" id="heroCiudad"></div>
-      <div class="emp-desc" id="heroDesc"></div>
-      <div class="emp-socials" id="heroSocials"></div>
+<div class="loader" id="loader"><div class="spinner"></div><span style="font-size:.8rem;color:rgba(250,250,246,.3)">Cargando...</span></div>
+<div id="appWrap" style="display:none">
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-bottom"></div>
+    <div class="hero-inner">
+      <div id="heroLogo"></div>
+      <div class="hero-nombre" id="heroNombre"></div>
+      <div class="hero-ciudad" id="heroCiudad"></div>
+      <div class="hero-desc" id="heroDesc"></div>
+      <div class="socials" id="heroSocials"></div>
     </div>
-  </div>
-  <div class="share-box" style="padding-left:0;padding-right:0;background:none;border:none;">
-    <span class="share-label">Comparte</span>
-    <span class="share-url" id="shareUrl"></span>
-    <button class="share-copy" onclick="copiarEnlace()">Copiar enlace</button>
-  </div>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section class="prods">
+    <div class="prods-head">
+      <span class="prods-title" id="prodCount"></span>
+      <div class="cat-scroll" id="catScroll"></div>
+    </div>
+    <div class="grid" id="prodGrid"></div>
+  </section>
+
 </div>
 
-<!-- LOADING / ERROR -->
-<div class="empty" id="loadingMsg"><div class="empty-icon">⏳</div><p>Cargando...</p></div>
-<div class="empty" id="errorMsg" style="display:none"><div class="empty-icon">😕</div><p id="errorTxt">No se encontró el emprendimiento.</p></div>
-
-<!-- PRODUCTOS -->
-<div class="section" id="prodSection" style="display:none">
-  <div class="section-title" id="prodCount"></div>
-  <div class="grid" id="prodGrid"></div>
-</div>
-
-<!-- MODAL PRODUCTO -->
+<!-- MODAL -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)cerrarModal()">
-  <div class="modal">
-    <div class="modal-head">
-      <div class="modal-title" id="mNombre"></div>
-      <button class="modal-close" onclick="cerrarModal()">✕</button>
-    </div>
+  <div class="modal" id="modal">
+    <div class="modal-close-btn"><button onclick="cerrarModal()">✕</button></div>
+    <div id="mMedia"></div>
     <div class="modal-body">
-      <div class="gallery" id="mGallery"></div>
-      <div class="detail-desc" id="mDesc"></div>
-      <div class="detail-grid" id="mGrid"></div>
-      <a id="mWA" class="wa-btn" href="#" target="_blank" rel="noopener">
-        💬 Contactar por WhatsApp
+      <div class="gallery-mini" id="mGallery" style="display:none"></div>
+      <div class="modal-nombre" id="mNombre"></div>
+      <div class="modal-precio" id="mPrecio"></div>
+      <div class="modal-desc" id="mDesc"></div>
+      <div class="modal-attrs" id="mAttrs"></div>
+      <a class="modal-wa" id="mWA" href="#" target="_blank" rel="noopener" style="display:none">
+        💬 Pedir por WhatsApp
       </a>
     </div>
   </div>
+</div>
+
+<!-- SHARE STICKY -->
+<div class="share-sticky" id="shareSticky" style="display:none">
+  <button class="share-btn share-btn-main" onclick="compartir()">📤 Compartir</button>
+  <button class="share-btn share-btn-copy" onclick="copiarEnlace()">🔗 Copiar enlace</button>
 </div>
 
 <script>
 const SUPA_URL  = 'https://kubcmjbiaithfvozmdul.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YmNtamJpYWl0aGZ2b3ptZHVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjI0MzAsImV4cCI6MjA4OTE5ODQzMH0.GoT7vRuwEv7P2mJU1hqIzAXnaNdm4ji-DQM-2WU7WOM';
 
-const CAT = {detalles:'🎁 Detalles',arte:'🎨 Arte',peluches:'🧸 Peluches',termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',papeleria:'📚 Papelería',reposteria:'🍰 Repostería',san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'};
+const CAT_LABEL = {detalles:'🎁 Detalles',arte:'🎨 Arte',peluches:'🧸 Peluches',termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',papeleria:'📚 Papelería',reposteria:'🍰 Repostería',san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'};
 
-const params = new URLSearchParams(location.search);
-const empId  = params.get('id');
+const params  = new URLSearchParams(location.search);
+const slug    = params.get('e');
+const idParam = params.get('id');
 
-let emprendedor = null;
-let productos   = [];
+let emp  = null;
+let prods = [];
+let catActiva = '';
 
+// ── Helpers fetch ─────────────────────────────────────────────────────────────
+function sbFetch(path) {
+  return fetch(`${SUPA_URL}/rest/v1/${path}`, {
+    headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` }
+  }).then(r => r.json());
+}
+
+// ── Cargar datos ──────────────────────────────────────────────────────────────
 async function cargar() {
-  if (!empId) { mostrarError('URL inválida: falta el parámetro ?id='); return; }
+  let empFilter;
+  if (slug)    empFilter = `slug=eq.${encodeURIComponent(slug)}&activo=eq.true`;
+  else if (idParam) empFilter = `id=eq.${idParam}&activo=eq.true`;
+  else { mostrarError('URL inválida'); return; }
 
-  const [empRes, prodRes] = await Promise.all([
-    fetch(`${SUPA_URL}/rest/v1/emprendedores?id=eq.${empId}&activo=eq.true&select=*`,
-      { headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` } }),
-    fetch(`${SUPA_URL}/rest/v1/emprende_productos?emprendedor_id=eq.${empId}&activo=eq.true&order=creado_en.desc&select=*`,
-      { headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` } }),
+  const [empArr, prodArr] = await Promise.all([
+    sbFetch(`emprendedores?${empFilter}&select=*`),
+    sbFetch(`emprende_productos?activo=eq.true&order=creado_en.desc&select=*`)
+      .then(arr => {
+        // filtrar por emprendedor después de saber el id
+        return arr; // se filtra abajo
+      })
   ]);
 
-  const empData  = await empRes.json();
-  const prodData = await prodRes.json();
+  if (!empArr.length) { mostrarError('Este emprendimiento no está disponible.'); return; }
+  emp = empArr[0];
 
-  if (!empData.length) { mostrarError('Este emprendimiento no está disponible o no existe.'); return; }
+  // Filtrar productos de este emprendedor
+  const allProds = await sbFetch(`emprende_productos?emprendedor_id=eq.${emp.id}&activo=eq.true&order=creado_en.desc&select=*`);
+  prods = allProds || [];
 
-  emprendedor = empData[0];
-  productos   = prodData || [];
+  // Aplicar color personalizado
+  const color = emp.color_primario || '#8FBC5A';
+  document.documentElement.style.setProperty('--c', color);
 
-  document.title = `${emprendedor.nombre_emprendimiento} — GeoOrigen Emprende`;
+  document.title = `${emp.nombre_emprendimiento} — GeoOrigen Emprende`;
+
   renderHero();
-  renderProductos();
+  renderCats();
+  renderGrid();
+
+  document.getElementById('loader').style.display = 'none';
+  document.getElementById('appWrap').style.display = '';
+  document.getElementById('shareSticky').style.display = 'flex';
 }
 
+// ── Hero ─────────────────────────────────────────────────────────────────────
 function renderHero() {
+  // Banner
+  const banner = emp.banner_url || (prods[0]?.foto_principal_url) || '';
+  if (banner) document.getElementById('heroBg').style.backgroundImage = `url('${banner}')`;
+  else {
+    document.getElementById('heroBg').style.background =
+      `linear-gradient(135deg, color-mix(in srgb, ${emp.color_primario||'#8FBC5A'} 40%, #0E0E0A) 0%, #0E0E0A 100%)`;
+  }
+
   // Logo
-  document.getElementById('heroLogo').innerHTML = emprendedor.logo_url
-    ? `<img src="${emprendedor.logo_url}" class="emp-logo" alt="Logo">`
-    : `<div class="emp-logo-ph">🏪</div>`;
+  document.getElementById('heroLogo').innerHTML = emp.logo_url
+    ? `<img src="${emp.logo_url}" class="hero-logo" alt="Logo">`
+    : `<div class="hero-logo-ph">🏪</div>`;
 
-  document.getElementById('heroNombre').textContent = emprendedor.nombre_emprendimiento;
-  document.getElementById('heroCiudad').textContent = emprendedor.ciudad ? `📍 ${emprendedor.ciudad}` : '';
-  document.getElementById('heroDesc').textContent = emprendedor.descripcion || '';
+  document.getElementById('heroNombre').textContent = emp.nombre_emprendimiento;
+  document.getElementById('heroCiudad').innerHTML = emp.ciudad ? `<span>📍</span><span>${emp.ciudad}</span>` : '';
+  document.getElementById('heroDesc').textContent  = emp.descripcion || '';
 
-  // Socials
-  const soc = [];
-  if (emprendedor.whatsapp) soc.push(`<a class="soc-btn soc-wa" href="https://wa.me/${emprendedor.whatsapp}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
-  if (emprendedor.instagram) soc.push(`<a class="soc-btn soc-ig" href="https://instagram.com/${emprendedor.instagram}" target="_blank" rel="noopener">📸 @${emprendedor.instagram}</a>`);
-  if (emprendedor.facebook) soc.push(`<a class="soc-btn soc-fb" href="${emprendedor.facebook}" target="_blank" rel="noopener">👍 Facebook</a>`);
-  document.getElementById('heroSocials').innerHTML = soc.join('');
-
-  // Share URL
-  const url = `${location.origin}${location.pathname}?id=${emprendedor.id}`;
-  document.getElementById('shareUrl').textContent = url;
-
-  document.getElementById('loadingMsg').style.display = 'none';
-  document.getElementById('heroWrap').style.display = '';
+  // Redes sociales
+  const redes = [];
+  if (emp.whatsapp)  redes.push(`<a class="soc soc-wa" href="https://wa.me/${emp.whatsapp}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
+  if (emp.instagram) redes.push(`<a class="soc soc-ig" href="https://instagram.com/${emp.instagram.replace('@','')}" target="_blank" rel="noopener">📸 Instagram</a>`);
+  if (emp.facebook)  redes.push(`<a class="soc soc-fb" href="${emp.facebook}" target="_blank" rel="noopener">👍 Facebook</a>`);
+  if (emp.tiktok)    redes.push(`<a class="soc soc-tk" href="https://tiktok.com/@${emp.tiktok.replace('@','')}" target="_blank" rel="noopener">🎵 TikTok</a>`);
+  document.getElementById('heroSocials').innerHTML = redes.join('');
 }
 
-function renderProductos() {
-  document.getElementById('prodCount').textContent = `${productos.length} producto${productos.length !== 1 ? 's' : ''}`;
-  document.getElementById('prodGrid').innerHTML = productos.map((p, i) => {
+// ── Categorías ────────────────────────────────────────────────────────────────
+function renderCats() {
+  const cats = [...new Set(prods.map(p => p.categoria))].filter(Boolean);
+  const scroll = document.getElementById('catScroll');
+  if (cats.length < 2) { scroll.style.display = 'none'; return; }
+  scroll.innerHTML = `<button class="cat-btn on" onclick="filtrarCat('',this)">Todos</button>`
+    + cats.map(c => `<button class="cat-btn" onclick="filtrarCat('${c}',this)">${CAT_LABEL[c]||c}</button>`).join('');
+}
+
+function filtrarCat(cat, btn) {
+  catActiva = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderGrid();
+}
+
+// ── Grid ──────────────────────────────────────────────────────────────────────
+function renderGrid() {
+  const lista = catActiva ? prods.filter(p => p.categoria === catActiva) : prods;
+  document.getElementById('prodCount').textContent = `${lista.length} producto${lista.length !== 1?'s':''}`;
+  if (!lista.length) {
+    document.getElementById('prodGrid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🛍️</div><p>Sin productos en esta categoría</p></div>';
+    return;
+  }
+  document.getElementById('prodGrid').innerHTML = lista.map((p,i) => {
+    const idx = prods.indexOf(p);
     const precio = p.precio ? `$${Number(p.precio).toLocaleString('es-CO')}` : 'Consultar precio';
     const pills = [
       p.personalizable ? '<span class="pill">✨ Personalizable</span>' : '',
       p.hace_envios    ? '<span class="pill">🚚 Envíos</span>' : '',
-      p.disponibilidad === 'inmediata' ? '<span class="pill">⚡ Inmediata</span>' : '<span class="pill">🔧 Bajo pedido</span>',
+      p.disponibilidad==='inmediata' ? '<span class="pill">⚡ Inmediata</span>' : '<span class="pill">🔧 Bajo pedido</span>',
     ].filter(Boolean).join('');
-    return `<div class="card" onclick="abrirModal(${i})">
+    return `<div class="card" onclick="abrirModal(${idx})">
       ${p.foto_principal_url
         ? `<img class="card-img" src="${p.foto_principal_url}" alt="${p.nombre}" loading="lazy">`
         : `<div class="card-img-ph">📦</div>`}
@@ -219,63 +295,89 @@ function renderProductos() {
       </div>
     </div>`;
   }).join('');
-  document.getElementById('prodSection').style.display = '';
 }
 
+// ── Modal ─────────────────────────────────────────────────────────────────────
 function abrirModal(idx) {
-  const p = productos[idx];
+  const p = prods[idx];
+  const fotos = [p.foto_principal_url, ...(p.galeria_urls||[])].filter(Boolean);
+
+  // Foto principal grande
+  document.getElementById('mMedia').innerHTML = fotos.length
+    ? `<img src="${fotos[0]}" class="modal-img" alt="${p.nombre}">`
+    : `<div class="modal-img-ph">📦</div>`;
+
+  // Galería mini (fotos 2+)
+  const galEl = document.getElementById('mGallery');
+  if (fotos.length > 1) {
+    galEl.style.display = 'grid';
+    galEl.innerHTML = fotos.slice(1).map(u =>
+      `<img src="${u}" alt="" onclick="window.open('${u}','_blank')">`).join('');
+  } else { galEl.style.display = 'none'; }
+
   document.getElementById('mNombre').textContent = p.nombre;
-  document.getElementById('mDesc').textContent = p.descripcion || '';
+  document.getElementById('mPrecio').textContent  = p.precio ? `$${Number(p.precio).toLocaleString('es-CO')}` : 'Consultar precio';
+  document.getElementById('mDesc').textContent    = p.descripcion || '';
 
-  // Galería
-  const fotos = [p.foto_principal_url, ...(p.galeria_urls || [])].filter(Boolean);
-  document.getElementById('mGallery').innerHTML = fotos.length
-    ? fotos.map(u => `<img src="${u}" alt="${p.nombre}" onclick="window.open('${u}','_blank')">`).join('')
-    : '';
-  document.getElementById('mGallery').style.display = fotos.length ? '' : 'none';
-
-  // Detalles
-  const items = [
-    p.precio ? { label: 'Precio', val: `$${Number(p.precio).toLocaleString('es-CO')}` } : null,
-    p.disponibilidad ? { label: 'Disponibilidad', val: p.disponibilidad === 'inmediata' ? '⚡ Entrega inmediata' : p.disponibilidad === 'pedido' ? '🔧 Solo bajo pedido' : '⚡ Inmediata o bajo pedido' } : null,
-    p.personalizable ? { label: 'Personalización', val: p.que_personalizar || 'Sí' } : null,
-    p.tiempo_elaboracion ? { label: 'Tiempo elaboración', val: p.tiempo_elaboracion } : null,
-    p.ciudad ? { label: 'Ciudad', val: p.ciudad } : null,
-    p.hace_envios ? { label: 'Envíos', val: p.tiempo_entrega || 'Sí hace envíos' } : null,
+  const attrs = [
+    p.disponibilidad ? {l:'Disponibilidad', v: p.disponibilidad==='inmediata'?'⚡ Entrega inmediata':p.disponibilidad==='pedido'?'🔧 Solo bajo pedido':'Inmediata o bajo pedido'} : null,
+    p.personalizable ? {l:'Personalización', v: p.que_personalizar||'Sí'} : null,
+    p.tiempo_elaboracion ? {l:'Tiempo elaboración', v: p.tiempo_elaboracion} : null,
+    p.ciudad ? {l:'Ciudad', v: p.ciudad} : null,
+    p.hace_envios ? {l:'Envíos', v: p.tiempo_entrega||'Sí'} : null,
+    p.categoria ? {l:'Categoría', v: CAT_LABEL[p.categoria]||p.categoria} : null,
   ].filter(Boolean);
-  document.getElementById('mGrid').innerHTML = items.map(d =>
-    `<div class="dg-item"><label>${d.label}</label><p>${d.val}</p></div>`
-  ).join('');
+  document.getElementById('mAttrs').innerHTML = attrs.map(a =>
+    `<div class="attr"><label>${a.l}</label><p>${a.v}</p></div>`).join('');
 
-  // WhatsApp
-  const waNum = emprendedor.whatsapp || '';
-  const msg = encodeURIComponent(`Hola, vi tu producto "${p.nombre}" en GeoOrigen Emprende y me gustaría más información.`);
+  const wa = emp.whatsapp || '';
   const waEl = document.getElementById('mWA');
-  if (waNum) { waEl.href = `https://wa.me/${waNum}?text=${msg}`; waEl.style.display = 'flex'; }
-  else { waEl.style.display = 'none'; }
+  if (wa) {
+    const msg = encodeURIComponent(`Hola ${emp.nombre_emprendimiento}, vi tu producto "${p.nombre}" en GeoOrigen y me interesa 😊`);
+    waEl.href = `https://wa.me/${wa}?text=${msg}`;
+    waEl.style.display = 'flex';
+  } else { waEl.style.display = 'none'; }
 
   document.getElementById('modalBg').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function cerrarModal() {
   document.getElementById('modalBg').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-function mostrarError(msg) {
-  document.getElementById('loadingMsg').style.display = 'none';
-  document.getElementById('errorTxt').textContent = msg;
-  document.getElementById('errorMsg').style.display = '';
+// ── Compartir ─────────────────────────────────────────────────────────────────
+function miUrl() {
+  return slug
+    ? `${location.origin}${location.pathname}?e=${slug}`
+    : `${location.origin}${location.pathname}?id=${emp.id}`;
 }
 
+function compartir() {
+  const url = miUrl();
+  if (navigator.share) {
+    navigator.share({
+      title: emp.nombre_emprendimiento,
+      text: `Conoce ${emp.nombre_emprendimiento} en GeoOrigen Emprende 🛍️`,
+      url
+    }).catch(() => {});
+  } else {
+    copiarEnlace();
+  }
+}
+
+let copyTimer;
 function copiarEnlace() {
-  const url = `${location.origin}${location.pathname}?id=${emprendedor.id}`;
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = document.querySelector('.share-copy');
-    btn.textContent = '¡Copiado!';
-    setTimeout(() => btn.textContent = 'Copiar enlace', 2000);
+  navigator.clipboard.writeText(miUrl()).then(() => {
+    const btn = document.querySelector('.share-btn-copy');
+    btn.textContent = '✓ Copiado';
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => btn.textContent = '🔗 Copiar enlace', 2500);
   });
+}
+
+function mostrarError(msg) {
+  document.getElementById('loader').innerHTML = `<div style="text-align:center;padding:2rem"><div style="font-size:3rem;margin-bottom:1rem">😕</div><p style="color:rgba(250,250,246,.4);font-size:.9rem">${msg}</p><a href="emprende.html" style="color:var(--c);font-size:.85rem;text-decoration:none;margin-top:1rem;display:inline-block">← Volver a Emprende</a></div>`;
 }
 
 cargar();

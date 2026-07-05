@@ -229,16 +229,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
         <div class="stat-card"><div class="stat-val" id="statActivos">—</div><div class="stat-label">Productos activos</div></div>
         <div class="stat-card"><div class="stat-val" id="statMemb" style="font-size:1rem;padding-top:0.4rem;">—</div><div class="stat-label">Membresía hasta</div></div>
       </div>
-      <!-- Enlace compartible -->
-      <div class="card" style="margin-bottom:1rem;">
-        <div class="card-head"><div class="card-title">🔗 Tu enlace público</div></div>
-        <div class="card-body">
-          <div style="font-size:0.78rem;color:rgba(250,250,246,0.4);margin-bottom:0.6rem;">Comparte este enlace para que tus clientes vean solo tus productos:</div>
-          <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-            <span id="miEnlace" style="font-size:0.8rem;color:rgba(250,250,246,0.55);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(0,0,0,0.3);padding:0.5rem 0.75rem;border-radius:6px;border:1px solid rgba(143,188,90,0.12);">—</span>
-            <button class="btn btn-outline btn-sm" id="btnCopiarEnlace" onclick="copiarMiEnlace()">Copiar</button>
-            <a id="btnVerEnlace" href="#" target="_blank" class="btn btn-outline btn-sm">Ver página</a>
+      <!-- Tarjeta compartir -->
+      <div class="card" style="margin-bottom:1rem;overflow:hidden;">
+        <div id="shareCardBanner" style="height:80px;background:linear-gradient(135deg,rgba(143,188,90,0.3),rgba(26,26,20,0));background-size:cover;background-position:center;"></div>
+        <div class="card-body" style="display:flex;align-items:center;gap:1rem;padding-top:0.85rem;">
+          <div id="shareCardLogo" style="width:48px;height:48px;border-radius:50%;background:rgba(143,188,90,0.15);border:2px solid rgba(143,188,90,0.3);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">🏪</div>
+          <div style="flex:1;min-width:0;">
+            <div id="shareCardNombre" style="font-size:0.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+            <div id="shareCardSub" style="font-size:0.73rem;color:rgba(250,250,246,0.38);">Tu página en GeoOrigen Emprende</div>
           </div>
+          <a id="btnVerEnlace" href="#" target="_blank" class="btn btn-outline btn-sm">Ver</a>
+        </div>
+        <div style="padding:0 1.2rem 1.2rem;display:flex;gap:0.6rem;">
+          <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="compartirPagina()">📤 Compartir mi página</button>
+          <button class="btn btn-outline btn-sm" id="btnCopiarEnlace" onclick="copiarMiEnlace()" style="flex-shrink:0;">🔗 Copiar</button>
         </div>
       </div>
       <div class="card">
@@ -371,10 +375,46 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
     <div class="page" id="p-perfil">
       <div class="page-header">
         <div class="page-title">Mi perfil de emprendimiento</div>
-        <div class="page-sub">Esta información aparece en la página pública junto a tus productos</div>
+        <div class="page-sub">Esta información aparece en tu página pública</div>
       </div>
+
+      <!-- Apariencia -->
       <div class="card">
-        <div class="card-head"><div class="card-title">Información del emprendimiento</div></div>
+        <div class="card-head"><div class="card-title">🎨 Apariencia de tu página</div></div>
+        <div class="card-body">
+          <!-- Color -->
+          <div class="fg" style="margin-bottom:1.25rem;">
+            <label class="fl">Color principal de tu página</label>
+            <div style="display:flex;align-items:center;gap:1rem;margin-top:0.35rem;">
+              <input type="color" id="pfColor" value="#8FBC5A"
+                style="width:48px;height:48px;border:none;background:none;cursor:pointer;border-radius:8px;padding:2px;"
+                oninput="previewColor(this.value)">
+              <div>
+                <div id="pfColorPreview" style="font-size:0.78rem;font-weight:500;margin-bottom:0.15rem;">Color actual</div>
+                <div style="font-size:0.7rem;color:rgba(250,250,246,0.35);">Afecta botones, precios y detalles de tu página</div>
+              </div>
+              <div id="pfColorSwatch" style="width:36px;height:36px;border-radius:50%;background:#8FBC5A;margin-left:auto;flex-shrink:0;"></div>
+            </div>
+          </div>
+          <!-- Banner -->
+          <div class="fg">
+            <label class="fl">Foto de portada (banner hero)</label>
+            <div style="margin-top:0.35rem;">
+              <div id="pfBannerPreview" style="display:none;width:100%;height:130px;border-radius:8px;object-fit:cover;background-size:cover;background-position:center;margin-bottom:0.6rem;border:1px solid rgba(143,188,90,0.15);"></div>
+              <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('bannerInput').click()">📷 Subir foto de portada</button>
+                <button class="btn btn-outline btn-sm" id="btnQuitarBanner" style="display:none" onclick="quitarBanner()">✕ Quitar</button>
+                <input type="file" id="bannerInput" accept="image/*" style="display:none" onchange="subirBanner(event)">
+              </div>
+              <div class="form-hint">Imagen horizontal recomendada. Si no subes una, se usará la foto de tu primer producto.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info básica -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">📋 Información del emprendimiento</div></div>
         <div class="card-body">
           <div class="form-row">
             <div class="fg"><label class="fl">Nombre del emprendimiento *</label>
@@ -382,22 +422,36 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
             <div class="fg"><label class="fl">Ciudad</label>
               <input class="fi" id="pfCiudad" placeholder="Ej: Bogotá, Cundinamarca"></div>
           </div>
-          <div class="fg"><label class="fl">Breve descripción del negocio</label>
-            <textarea class="fta" id="pfDesc" placeholder="¿Qué haces? ¿Qué te hace especial?" style="min-height:75px;"></textarea></div>
+          <div class="fg"><label class="fl">Descripción del negocio</label>
+            <textarea class="fta" id="pfDesc" placeholder="¿Qué haces? ¿Qué te hace especial? ¿Qué ofreces?" style="min-height:85px;"></textarea></div>
+          <div class="fg"><label class="fl">Logo URL (enlace a imagen de tu logo)</label>
+            <input class="fi" id="pfLogo" placeholder="https://..."></div>
+        </div>
+      </div>
+
+      <!-- Redes sociales -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">📱 Redes sociales y contacto</div></div>
+        <div class="card-body">
           <div class="form-row">
-            <div class="fg"><label class="fl">WhatsApp (solo números, con código país)</label>
-              <input class="fi" id="pfWA" placeholder="Ej: 573001234567"></div>
-            <div class="fg"><label class="fl">Logo URL (opcional)</label>
-              <input class="fi" id="pfLogo" placeholder="https://... (enlace a imagen)"></div>
+            <div class="fg">
+              <label class="fl">WhatsApp (con código de país)</label>
+              <input class="fi" id="pfWA" placeholder="573001234567" type="tel"></div>
+            <div class="fg">
+              <label class="fl">Instagram (usuario sin @)</label>
+              <input class="fi" id="pfIG" placeholder="micuenta"></div>
           </div>
           <div class="form-row">
-            <div class="fg"><label class="fl">Instagram (solo usuario, sin @)</label>
-              <input class="fi" id="pfIG" placeholder="micuenta"></div>
-            <div class="fg"><label class="fl">Facebook (URL completa, opcional)</label>
-              <input class="fi" id="pfFB" placeholder="https://facebook.com/..."></div>
+            <div class="fg">
+              <label class="fl">Facebook (URL completa)</label>
+              <input class="fi" id="pfFB" placeholder="https://facebook.com/mipagina"></div>
+            <div class="fg">
+              <label class="fl">TikTok (usuario sin @)</label>
+              <input class="fi" id="pfTikTok" placeholder="micuenta"></div>
           </div>
         </div>
       </div>
+
       <button class="btn btn-primary" onclick="guardarPerfil()">💾 Guardar cambios</button>
     </div>
   </div>
@@ -528,13 +582,33 @@ function renderMembAlert() {
 
 // ── Enlace público ────────────────────────────────────────────────────────────
 const BASE_EMP_URL = 'https://geoorigen-productos.wilmenrioblanco.workers.dev/emprendedor.html';
-function miEnlaceUrl() { return `${BASE_EMP_URL}?id=${emprendedor.id}`; }
+function miEnlaceUrl() {
+  return emprendedor.slug
+    ? `${BASE_EMP_URL}?e=${emprendedor.slug}`
+    : `${BASE_EMP_URL}?id=${emprendedor.id}`;
+}
+
 function copiarMiEnlace() {
   navigator.clipboard.writeText(miEnlaceUrl()).then(() => {
     const btn = document.getElementById('btnCopiarEnlace');
-    btn.textContent = '¡Copiado!';
-    setTimeout(() => btn.textContent = 'Copiar', 2000);
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = orig, 2000);
   });
+}
+
+function compartirPagina() {
+  const url = miEnlaceUrl();
+  if (navigator.share) {
+    navigator.share({
+      title: emprendedor.nombre_emprendimiento,
+      text: `Conoce ${emprendedor.nombre_emprendimiento} en GeoOrigen Emprende 🛍️`,
+      url
+    }).catch(() => {});
+  } else {
+    copiarMiEnlace();
+    toast('Enlace copiado ✓');
+  }
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
@@ -542,10 +616,20 @@ function renderDashboard() {
   document.getElementById('welcomeTitle').textContent = '👋 Hola, ' + emprendedor.nombre_emprendimiento;
   const hasta = emprendedor.membresia_hasta ? new Date(emprendedor.membresia_hasta).toLocaleDateString('es-CO') : 'Sin límite';
   document.getElementById('statMemb').textContent = hasta;
-  // Enlace compartible
+
+  // Tarjeta compartir
   const url = miEnlaceUrl();
-  document.getElementById('miEnlace').textContent = url;
   document.getElementById('btnVerEnlace').href = url;
+  document.getElementById('shareCardNombre').textContent = emprendedor.nombre_emprendimiento;
+  document.getElementById('shareCardSub').textContent = emprendedor.ciudad || 'Tu página en GeoOrigen Emprende';
+  if (emprendedor.logo_url) {
+    document.getElementById('shareCardLogo').innerHTML = `<img src="${emprendedor.logo_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  }
+  if (emprendedor.banner_url) {
+    const banner = document.getElementById('shareCardBanner');
+    banner.style.backgroundImage = `url('${emprendedor.banner_url}')`;
+    banner.style.backgroundSize = 'cover';
+  }
   renderMembAlert();
 }
 
@@ -769,11 +853,56 @@ function cargarFormPerfil() {
   document.getElementById('pfLogo').value = emprendedor.logo_url || '';
   document.getElementById('pfIG').value = emprendedor.instagram || '';
   document.getElementById('pfFB').value = emprendedor.facebook || '';
+  document.getElementById('pfTikTok').value = emprendedor.tiktok || '';
+  const color = emprendedor.color_primario || '#8FBC5A';
+  document.getElementById('pfColor').value = color;
+  previewColor(color);
+  if (emprendedor.banner_url) {
+    const bp = document.getElementById('pfBannerPreview');
+    bp.style.backgroundImage = `url('${emprendedor.banner_url}')`;
+    bp.style.backgroundSize = 'cover';
+    bp.style.display = 'block';
+    document.getElementById('btnQuitarBanner').style.display = 'inline-block';
+  }
+}
+
+function previewColor(val) {
+  document.getElementById('pfColorSwatch').style.background = val;
+}
+
+async function subirBanner(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop();
+  const path = `${emprendedor.id}/banner.${ext}`;
+  const { error: upErr } = await sb.storage.from('emprende-fotos').upload(path, file, { upsert: true });
+  if (upErr) { toast('Error subiendo banner: ' + upErr.message, 'err'); return; }
+  const { data } = sb.storage.from('emprende-fotos').getPublicUrl(path);
+  const url = data.publicUrl + '?t=' + Date.now();
+  emprendedor.banner_url = url;
+  const bp = document.getElementById('pfBannerPreview');
+  bp.style.backgroundImage = `url('${url}')`;
+  bp.style.backgroundSize = 'cover';
+  bp.style.display = 'block';
+  document.getElementById('btnQuitarBanner').style.display = 'inline-block';
+  await sb.from('emprendedores').update({ banner_url: url }).eq('id', emprendedor.id);
+  toast('Banner actualizado ✓');
+}
+
+async function quitarBanner() {
+  emprendedor.banner_url = null;
+  const bp2 = document.getElementById('pfBannerPreview');
+  bp2.style.backgroundImage = '';
+  bp2.style.display = 'none';
+  document.getElementById('btnQuitarBanner').style.display = 'none';
+  await sb.from('emprendedores').update({ banner_url: null }).eq('id', emprendedor.id);
+  toast('Banner eliminado');
 }
 
 async function guardarPerfil() {
   const nombre = document.getElementById('pfNombre').value.trim();
   if (!nombre) { toast('El nombre del emprendimiento es obligatorio', 'err'); return; }
+  const color = document.getElementById('pfColor').value;
   const { error } = await sb.from('emprendedores').update({
     nombre_emprendimiento: nombre,
     ciudad: document.getElementById('pfCiudad').value.trim() || null,
@@ -782,10 +911,14 @@ async function guardarPerfil() {
     logo_url: document.getElementById('pfLogo').value.trim() || null,
     instagram: document.getElementById('pfIG').value.trim().replace('@','') || null,
     facebook: document.getElementById('pfFB').value.trim() || null,
+    tiktok: document.getElementById('pfTikTok').value.trim().replace('@','') || null,
+    color_primario: color,
   }).eq('id', emprendedor.id);
   if (error) { toast('Error: ' + error.message, 'err'); return; }
   emprendedor.nombre_emprendimiento = nombre;
+  emprendedor.color_primario = color;
   document.getElementById('tbNombre').textContent = nombre;
+  renderDashboard();
   toast('Perfil actualizado ✓');
 }
 
