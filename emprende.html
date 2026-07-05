@@ -345,7 +345,6 @@ function filtrar() {
     renderCampo(lista);
   } else {
     const lista = emprendedoresList.filter(e => {
-      if (!e.activo) return false;
       if (!q) return true;
       const hay = [e.nombre_emprendimiento,e.ciudad,e.descripcion].filter(Boolean).join(' ').toLowerCase();
       return hay.includes(q);
