@@ -375,7 +375,11 @@ function renderHero() {
   // Logo
   const logoEl = document.getElementById('heroLogo');
   if (emp.logo_url) {
-    logoEl.innerHTML = `<img class="logo-img" src="${emp.logo_url}" alt="Logo de ${emp.nombre_emprendimiento}">`;
+    const img = document.createElement('img');
+    img.className = 'logo-img';
+    img.alt = `Logo de ${emp.nombre_emprendimiento}`;
+    img.src = emp.logo_url;
+    logoEl.replaceChildren(img);
   } else {
     logoEl.innerHTML = `<div class="logo-ph">🏪</div>`;
   }
@@ -464,7 +468,12 @@ function abrirModal(idx) {
   const gal = document.getElementById('sheetGallery');
   if (fotos.length > 1) {
     gal.style.display = 'flex';
-    gal.innerHTML = fotos.slice(1).map(u => `<img src="${u}" onclick="window.open('${u}','_blank')" loading="lazy">`).join('');
+    gal.replaceChildren(...fotos.slice(1).map(u => {
+      const img = document.createElement('img');
+      img.src = u; img.loading = 'lazy';
+      img.addEventListener('click', () => window.open(u, '_blank'));
+      return img;
+    }));
   } else { gal.style.display = 'none'; }
 
   document.getElementById('sheetName').textContent  = p.nombre;

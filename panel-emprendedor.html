@@ -863,7 +863,7 @@ async function guardarProducto() {
     emprendedor_id: emprendedor.id,
     nombre,
     categoria: cat,
-    precio: document.getElementById('fpPrecio').value ? Number(document.getElementById('fpPrecio').value) : null,
+    precio: (() => { const v = Number(document.getElementById('fpPrecio').value); return document.getElementById('fpPrecio').value && v >= 0 ? v : null; })(),
     descripcion: document.getElementById('fpDesc').value.trim() || null,
     foto_principal_url: foto_principal,
     galeria_urls: galeria,
@@ -1035,6 +1035,9 @@ function toggleGrad() {
 async function subirLogo(event) {
   const file = event.target.files[0];
   if (!file) return;
+  const TIPOS = ['image/jpeg','image/png','image/webp','image/gif'];
+  if (!TIPOS.includes(file.type)) { toast('Solo se permiten imágenes JPG, PNG, WEBP o GIF', 'err'); return; }
+  if (file.size > 5 * 1024 * 1024) { toast('El logo no puede superar 5 MB', 'err'); return; }
   const ext = file.name.split('.').pop();
   const path = `${emprendedor.id}/logo.${ext}`;
   const { error: upErr } = await sb.storage.from('emprende-fotos').upload(path, file, { upsert: true });
@@ -1060,7 +1063,9 @@ function _setLogoPreview(url) {
   const el = document.getElementById('pfLogoPreview');
   const btn = document.getElementById('btnQuitarLogo');
   if (url) {
-    el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+    const img = document.createElement('img');
+    img.src = url; img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    el.replaceChildren(img);
     btn.style.display = 'inline-block';
   } else {
     el.innerHTML = '🏪';
@@ -1071,6 +1076,9 @@ function _setLogoPreview(url) {
 async function subirBanner(event) {
   const file = event.target.files[0];
   if (!file) return;
+  const TIPOS = ['image/jpeg','image/png','image/webp','image/gif'];
+  if (!TIPOS.includes(file.type)) { toast('Solo se permiten imágenes JPG, PNG, WEBP o GIF', 'err'); return; }
+  if (file.size > 10 * 1024 * 1024) { toast('El banner no puede superar 10 MB', 'err'); return; }
   const ext = file.name.split('.').pop();
   const path = `${emprendedor.id}/banner.${ext}`;
   const { error: upErr } = await sb.storage.from('emprende-fotos').upload(path, file, { upsert: true });
@@ -1106,7 +1114,7 @@ async function guardarPerfil() {
     nombre_emprendimiento: nombre,
     ciudad: document.getElementById('pfCiudad').value.trim() || null,
     descripcion: document.getElementById('pfDesc').value.trim() || null,
-    whatsapp: document.getElementById('pfWA').value.trim() || null,
+    whatsapp: (() => { const w = document.getElementById('pfWA').value.trim(); if (w && !/^\d{7,15}$/.test(w)) { toast('WhatsApp: solo números, sin espacios ni guiones (ej: 573001234567)', 'err'); throw new Error('wa'); } return w || null; })(),
     instagram: document.getElementById('pfIG').value.trim().replace('@','') || null,
     facebook: document.getElementById('pfFB').value.trim() || null,
     tiktok: document.getElementById('pfTikTok').value.trim().replace('@','') || null,
