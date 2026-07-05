@@ -82,6 +82,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 .skeleton{background:linear-gradient(90deg,var(--gris2) 25%,rgba(255,255,255,0.05) 50%,var(--gris2) 75%);background-size:200%;animation:shimmer 1.4s infinite;border-radius:10px;height:290px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
+/* EMPRENDEDOR PROFILE CARDS */
+.emp-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))!important;}
+.emp-card{background:var(--gris2);border:1px solid var(--borde);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;transition:border-color .28s,transform .25s;cursor:pointer;}
+.emp-card:hover{border-color:rgba(143,188,90,.45);transform:translateY(-3px);}
+.emp-card-banner{height:80px;background:linear-gradient(135deg,#1c340f,#2d5016);background-size:cover;background-position:center;position:relative;flex-shrink:0;}
+.emp-card-banner-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08),rgba(26,26,20,.28));}
+.emp-card-logo{width:58px;height:58px;border-radius:50%;border:2.5px solid var(--gris2);position:absolute;bottom:-26px;left:1rem;z-index:2;object-fit:cover;background:var(--gris);}
+.emp-card-logo-ph{width:58px;height:58px;border-radius:50%;border:2.5px solid var(--gris2);position:absolute;bottom:-26px;left:1rem;z-index:2;background:rgba(143,188,90,.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.emp-card-body{padding:1.85rem 1.1rem 1.1rem;display:flex;flex-direction:column;gap:.4rem;flex:1;}
+.emp-card-name{font-size:.95rem;font-weight:500;line-height:1.25;color:var(--blanco);}
+.emp-card-city{font-size:.7rem;color:rgba(250,250,246,.35);display:flex;align-items:center;gap:.25rem;}
+.emp-card-desc{font-size:.76rem;color:rgba(250,250,246,.48);line-height:1.55;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:.1rem;}
+.emp-card-meta{font-size:.67rem;color:rgba(250,250,246,.25);margin-top:.25rem;}
+.emp-card-btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.73rem;font-weight:500;color:var(--menta);margin-top:.4rem;border:1px solid rgba(143,188,90,.2);background:rgba(143,188,90,.06);border-radius:4px;padding:.38rem .75rem;align-self:flex-start;transition:background .2s,gap .2s;}
+.emp-card-btn:hover{background:rgba(143,188,90,.12);gap:.5rem;}
+
 /* DETAIL MODAL */
 .modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(8,8,6,0.93);align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
 .modal-bg.open{display:flex;}
@@ -248,6 +264,7 @@ function esc(s) { return s == null ? '' : String(s).replace(/&/g,'&amp;').replac
 // ── Datos ─────────────────────────────────────────────────────────────────────
 let campoProd = [];
 let emprendeProd = [];
+let emprendedoresList = [];
 let seccion = 'campo';
 let catActual = 'todos';
 
@@ -265,15 +282,17 @@ const CAT_EMP = {
 // ── Carga ──────────────────────────────────────────────────────────────────────
 async function cargar() {
   try {
-    const [rc, re] = await Promise.all([
+    const [rc, re, remp] = await Promise.all([
       fetch(SUPA_URL + '/rest/v1/productos?activa=eq.true&order=destacado.desc,fecha_actualizacion.desc' +
         '&select=id,slug,nombre,descripcion_corta,descripcion,categoria,foto_portada_url,precio_desde,precio_hasta,unidad_base,nombre_productor,finca_slug,municipio,departamento,whatsapp,presentaciones,destacado', { headers: H }),
       fetch(SUPA_URL + '/rest/v1/emprende_productos?activo=eq.true&order=creado_en.desc' +
-        '&select=id,nombre,categoria,precio,descripcion,foto_principal_url,galeria_urls,personalizable,que_personalizar,tiempo_elaboracion,disponibilidad,ciudad,hace_envios,tiempo_entrega,emprendedores(nombre_emprendimiento,logo_url,whatsapp,instagram,facebook,ciudad)', { headers: H }),
+        '&select=id,nombre,categoria,precio,descripcion,foto_principal_url,galeria_urls,personalizable,que_personalizar,tiempo_elaboracion,disponibilidad,ciudad,hace_envios,tiempo_entrega,emprendedor_id,emprendedores(nombre_emprendimiento,logo_url,whatsapp,instagram,facebook,ciudad)', { headers: H }),
+      fetch(SUPA_URL + '/rest/v1/emprendedores?activo=eq.true&select=id,nombre_emprendimiento,logo_url,banner_url,ciudad,descripcion,slug,color_primario,whatsapp', { headers: H }),
     ]);
-    campoProd  = rc.ok  ? await rc.json()  : [];
-    emprendeProd = re.ok ? await re.json() : [];
-  } catch(e) { campoProd = []; emprendeProd = []; }
+    campoProd        = rc.ok   ? await rc.json()   : [];
+    emprendeProd     = re.ok   ? await re.json()   : [];
+    emprendedoresList = remp.ok ? await remp.json() : [];
+  } catch(e) { campoProd = []; emprendeProd = []; emprendedoresList = []; }
   buildCatTabs();
   filtrar();
 }
@@ -285,24 +304,23 @@ function setSection(s) {
   document.getElementById('searchInput').value = '';
   document.getElementById('depFilter').value = '';
   document.getElementById('depFilter').style.display = s === 'campo' ? '' : 'none';
+  document.getElementById('catTabs').style.display = s === 'campo' ? '' : 'none';
   document.getElementById('tabCampo').classList.toggle('active', s === 'campo');
   document.getElementById('tabEmprende').classList.toggle('active', s === 'emprende');
+  document.getElementById('searchInput').placeholder = s === 'campo' ? 'Buscar por nombre…' : 'Buscar emprendimiento…';
+  document.getElementById('grid').classList.toggle('emp-grid', s === 'emprende');
   buildCatTabs();
   filtrar();
 }
 
 // ── Pestañas de categoría ──────────────────────────────────────────────────────
 function buildCatTabs() {
+  if (seccion === 'emprende') return; // las cards de emprendedor no usan categorías
   const container = document.getElementById('catTabs');
   let btns = [`<button class="cat-tab active" onclick="setCat('todos',this)">Todos</button>`];
-  if (seccion === 'campo') {
-    const cats = [...new Set(campoProd.map(p => p.categoria).filter(Boolean))];
-    cats.sort((a,b) => { const ia=CAT_CAMPO_ORDER.indexOf(a),ib=CAT_CAMPO_ORDER.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib); });
-    cats.forEach(c => btns.push(`<button class="cat-tab" onclick="setCat('${esc(c)}',this)">${esc(CAT_CAMPO[c]||c)}</button>`));
-  } else {
-    const cats = [...new Set(emprendeProd.map(p => p.categoria).filter(Boolean))];
-    cats.forEach(c => btns.push(`<button class="cat-tab" onclick="setCat('${esc(c)}',this)">${esc(CAT_EMP[c]||c)}</button>`));
-  }
+  const cats = [...new Set(campoProd.map(p => p.categoria).filter(Boolean))];
+  cats.sort((a,b) => { const ia=CAT_CAMPO_ORDER.indexOf(a),ib=CAT_CAMPO_ORDER.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib); });
+  cats.forEach(c => btns.push(`<button class="cat-tab" onclick="setCat('${esc(c)}',this)">${esc(CAT_CAMPO[c]||c)}</button>`));
   container.innerHTML = btns.join('');
 }
 
@@ -315,11 +333,10 @@ function setCat(cat, btn) {
 
 // ── Filtrado y render ─────────────────────────────────────────────────────────
 function filtrar() {
-  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  const q   = (document.getElementById('searchInput').value || '').toLowerCase();
   const dep = document.getElementById('depFilter').value;
-  let lista;
   if (seccion === 'campo') {
-    lista = campoProd.filter(p => {
+    const lista = campoProd.filter(p => {
       if (catActual !== 'todos' && p.categoria !== catActual) return false;
       if (dep && p.departamento !== dep) return false;
       if (q) { const hay = [p.nombre,p.descripcion_corta,p.nombre_productor,p.municipio].filter(Boolean).join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
@@ -327,12 +344,12 @@ function filtrar() {
     });
     renderCampo(lista);
   } else {
-    lista = emprendeProd.filter(p => {
-      if (catActual !== 'todos' && p.categoria !== catActual) return false;
-      if (q) { const emp = p.emprendedores; const hay = [p.nombre,p.descripcion,emp?.nombre_emprendimiento,emp?.ciudad,p.ciudad].filter(Boolean).join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
-      return true;
+    const lista = emprendedoresList.filter(e => {
+      if (!q) return true;
+      const hay = [e.nombre_emprendimiento,e.ciudad,e.descripcion].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
     });
-    renderEmprende(lista);
+    renderEmpDir(lista);
   }
 }
 
@@ -363,35 +380,43 @@ function renderCampo(lista) {
   }).join('');
 }
 
-// ── Render tarjetas Emprendedores ─────────────────────────────────────────────
-function renderEmprende(lista) {
+// ── Directorio de Emprendedores ───────────────────────────────────────────────
+function renderEmpDir(lista) {
   const grid = document.getElementById('grid');
   const info = document.getElementById('resultsInfo');
-  info.innerHTML = `<span>${lista.length}</span> producto${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}`;
+  info.innerHTML = `<span>${lista.length}</span> emprendimiento${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}`;
   if (!lista.length) { grid.innerHTML = emptyHTML('Emprendedores'); return; }
-  grid.innerHTML = lista.map(p => {
-    const emp = p.emprendedores || {};
-    const cat = CAT_EMP[p.categoria] || p.categoria || '';
-    const precio = p.precio ? '$' + Number(p.precio).toLocaleString('es-CO') : '';
-    const idx = emprendeProd.indexOf(p);
-    return `<div class="card" onclick="abrirEmprende(${idx})">
-      <div class="card-thumb">
-        ${p.foto_principal_url ? `<img src="${esc(p.foto_principal_url)}" alt="${esc(p.nombre)}" loading="lazy">` : thumbPH()}
-        <div class="card-thumb-ov"></div>
-        ${cat?`<div class="card-cat">${esc(cat)}</div>`:''}
-        <div class="emprende-badge">Emprendedor</div>
+
+  grid.innerHTML = lista.map(e => {
+    const url    = e.slug ? `https://geoorigen.com/emprendedor/${e.slug}` : `emprendedor.html?id=${e.id}`;
+    const color  = e.color_primario || '#8FBC5A';
+    // Contar productos de este emprendedor
+    const nProds = emprendeProd.filter(p => p.emprendedor_id === e.id).length;
+    const metaTxt = nProds ? `${nProds} producto${nProds!==1?'s':''}` : 'Sin productos aún';
+
+    const bannerStyle = e.banner_url
+      ? `background-image:url('${esc(e.banner_url)}');background-size:cover;background-position:center;`
+      : `background:linear-gradient(135deg,color-mix(in srgb,${color} 40%,#1a1a14),#1a1a14);`;
+
+    const logoEl = e.logo_url
+      ? `<img class="emp-card-logo" src="${esc(e.logo_url)}" alt="${esc(e.nombre_emprendimiento)}" loading="lazy">`
+      : `<div class="emp-card-logo-ph" style="background:color-mix(in srgb,${color} 12%,#232318);">🏪</div>`;
+
+    return `<a class="emp-card" href="${url}">
+      <div class="emp-card-banner" style="${bannerStyle}">
+        <div class="emp-card-banner-ov"></div>
+        ${logoEl}
       </div>
-      <div class="card-body">
-        <div class="card-nombre">${esc(p.nombre)}</div>
-        <div class="card-prod">${iconUser()} ${esc(emp.nombre_emprendimiento||'—')}${(p.ciudad||emp.ciudad)?' · '+esc(p.ciudad||emp.ciudad):''}</div>
-        ${precio?`<div class="card-precio">${esc(precio)}</div>`:'<div style="height:1.1rem"></div>'}
-        <div class="pres-wrap">
-          ${p.personalizable?`<span class="pres-pill">✎ Personalizable</span>`:''}
-          ${p.disponibilidad==='inmediata'?`<span class="pres-pill">⚡ Entrega inmediata</span>`:p.disponibilidad==='pedido'?`<span class="pres-pill">🔧 Bajo pedido</span>`:`<span class="pres-pill">Inmediata o pedido</span>`}
-          ${p.hace_envios?`<span class="pres-pill">📦 Envíos</span>`:''}
+      <div class="emp-card-body">
+        <div class="emp-card-name">${esc(e.nombre_emprendimiento)}</div>
+        ${e.ciudad ? `<div class="emp-card-city">📍 ${esc(e.ciudad)}</div>` : ''}
+        ${e.descripcion ? `<div class="emp-card-desc">${esc(e.descripcion)}</div>` : ''}
+        <div class="emp-card-meta">${metaTxt}</div>
+        <div class="emp-card-btn" style="color:${color};border-color:color-mix(in srgb,${color} 25%,transparent);background:color-mix(in srgb,${color} 7%,transparent);">
+          Ver tienda →
         </div>
       </div>
-    </div>`;
+    </a>`;
   }).join('');
 }
 

@@ -3,381 +3,519 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emprendedor — GeoOrigen Emprende</title>
+<title>GeoOrigen Emprende</title>
 <meta name="description" content="Conoce este emprendimiento en GeoOrigen Emprende">
 <link rel="icon" href="data:,">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --c:#8FBC5A;          /* color primario del emprendedor — se sobreescribe con JS */
-  --c-dark:color-mix(in srgb, var(--c) 70%, #000);
-  --c-glow:color-mix(in srgb, var(--c) 25%, transparent);
-  --negro:#0E0E0A;--blanco:#FAFAF6;--gris:#1C1C15;--gris2:#242419;--borde:rgba(255,255,255,0.1);
+  --c:#8FBC5A;
+  --cd:color-mix(in srgb,var(--c) 60%,#000);
+  --cl:color-mix(in srgb,var(--c) 15%,transparent);
+  --cll:color-mix(in srgb,var(--c) 7%,transparent);
+  --negro:#090907;--blanco:#FAFAF6;
+  --gris:#161611;--gris2:#1D1D16;--gris3:#232319;
+  --borde:rgba(255,255,255,0.07);
+  --txt:rgba(250,250,246,0.72);
+  --txt-dim:rgba(250,250,246,0.32);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
 body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco);min-height:100vh;}
 
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:var(--negro);}
+.spin{width:30px;height:30px;border:2px solid rgba(255,255,255,.07);border-top-color:var(--c);border-radius:50%;animation:rot .7s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg);}}
+
+/* ── TOPBAR ── */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.1rem;transition:background .35s,border-color .35s;border-bottom:1px solid transparent;}
+#topbar.solid{background:rgba(9,9,7,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:var(--borde);}
+.tb-back{display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--txt-dim);text-decoration:none;transition:color .2s;}
+.tb-back:hover{color:rgba(250,250,246,.7);}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tb-logo{font-size:.78rem;font-weight:500;color:var(--txt-dim);letter-spacing:.02em;}
+
 /* ── HERO ── */
-.hero{position:relative;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:2.5rem;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.45);}
-.hero-gradient{position:absolute;inset:0;background:linear-gradient(160deg,var(--c-dark) 0%,transparent 50%,var(--negro) 100%);opacity:.75;}
-.hero-bottom{position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to top,var(--negro),transparent);}
-.hero-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 1.5rem;max-width:680px;margin:0 auto;}
-.hero-logo{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.25);margin-bottom:1.25rem;background:var(--gris2);box-shadow:0 0 0 6px var(--c-glow);}
-.hero-logo-ph{width:100px;height:100px;border-radius:50%;background:var(--c-glow);border:3px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:2.8rem;margin-bottom:1.25rem;box-shadow:0 0 0 6px var(--c-glow);}
-.hero-nombre{font-size:2.1rem;font-weight:600;line-height:1.1;margin-bottom:.5rem;letter-spacing:-.02em;}
-.hero-ciudad{font-size:.82rem;color:rgba(250,250,246,.5);margin-bottom:1rem;display:flex;align-items:center;gap:.35rem;}
-.hero-desc{font-size:.9rem;color:rgba(250,250,246,.7);line-height:1.7;max-width:520px;margin-bottom:1.5rem;}
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,7,.18) 0%,rgba(9,9,7,.05) 35%,rgba(9,9,7,.78) 72%,var(--negro) 100%);}
+.hero-tint{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 80%,var(--cl) 0%,transparent 70%);}
+.hero-content{position:relative;z-index:2;width:100%;max-width:700px;margin:0 auto;padding:7rem 1.5rem 3.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;}
 
-/* ── REDES SOCIALES ── */
-.socials{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;}
-.soc{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem 1rem;border-radius:50px;font-size:.78rem;font-weight:500;text-decoration:none;border:1px solid;transition:all .2s;}
-.soc-wa {color:#25d366;border-color:rgba(37,211,102,.3);background:rgba(37,211,102,.08);}  .soc-wa:hover{background:rgba(37,211,102,.18);}
-.soc-ig {color:#e4405f;border-color:rgba(228,64,95,.3);background:rgba(228,64,95,.08);}    .soc-ig:hover{background:rgba(228,64,95,.18);}
-.soc-fb {color:#1877f2;border-color:rgba(24,119,242,.3);background:rgba(24,119,242,.08);}  .soc-fb:hover{background:rgba(24,119,242,.18);}
-.soc-tk {color:#ff0050;border-color:rgba(255,0,80,.3);background:rgba(255,0,80,.08);}      .soc-tk:hover{background:rgba(255,0,80,.18);}
+/* Logo con anillos */
+.logo-wrap{position:relative;width:104px;height:104px;margin-bottom:1.6rem;flex-shrink:0;}
+.logo-ring1{position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--c);opacity:.4;}
+.logo-ring2{position:absolute;inset:-14px;border-radius:50%;border:1px solid var(--c);opacity:.15;}
+.logo-ring3{position:absolute;inset:-24px;border-radius:50%;border:1px solid var(--c);opacity:.06;}
+.logo-img{width:100%;height:100%;border-radius:50%;object-fit:cover;position:relative;z-index:1;}
+.logo-ph{width:100%;height:100%;border-radius:50%;background:var(--cl);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:2.8rem;position:relative;z-index:1;}
 
-/* ── NAV MINI ── */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(14,14,10,.8),transparent);pointer-events:none;}
-.topbar a{pointer-events:all;font-size:.75rem;color:rgba(250,250,246,.45);text-decoration:none;display:flex;align-items:center;gap:.35rem;transition:color .2s;}
-.topbar a:hover{color:rgba(250,250,246,.8);}
-.topbar-logo{font-size:.8rem;font-weight:500;color:rgba(250,250,246,.3);}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin-bottom:.8rem;opacity:.9;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';flex:1;height:1px;width:20px;background:var(--c);opacity:.3;}
+.hero-name{font-size:clamp(2rem,8vw,3.5rem);font-weight:600;line-height:1.03;letter-spacing:-.035em;margin-bottom:.6rem;}
+.hero-city{display:inline-flex;align-items:center;gap:.45rem;font-size:.78rem;color:var(--txt-dim);margin-bottom:1.1rem;}
+.hero-city-dot{width:4px;height:4px;border-radius:50%;background:var(--c);}
+.hero-desc{font-size:.91rem;color:var(--txt);line-height:1.8;max-width:480px;margin-bottom:1.8rem;}
 
-/* ── PRODUCTOS ── */
-.prods{max-width:960px;margin:0 auto;padding:2rem 1.25rem 7rem;}
-.prods-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem;}
-.prods-title{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(250,250,246,.28);}
-.cat-scroll{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.25rem;scrollbar-width:none;}
-.cat-scroll::-webkit-scrollbar{display:none;}
-.cat-btn{flex-shrink:0;padding:.38rem .85rem;border-radius:50px;font-size:.74rem;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(250,250,246,.45);font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
-.cat-btn.on{background:var(--c);color:#000;border-color:var(--c);font-weight:500;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
-.card{background:var(--gris2);border:1px solid var(--borde);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color .25s,transform .25s;}
-.card:hover{border-color:var(--c);transform:translateY(-3px);}
-.card-img{width:100%;height:190px;object-fit:cover;background:var(--gris);display:block;}
-.card-img-ph{width:100%;height:190px;background:var(--c-glow);display:flex;align-items:center;justify-content:center;font-size:3rem;}
-.card-body{padding:1rem;}
-.card-nombre{font-size:.9rem;font-weight:500;margin-bottom:.35rem;line-height:1.3;}
-.card-precio{font-size:.88rem;color:var(--c);margin-bottom:.5rem;font-weight:500;}
-.card-pills{display:flex;flex-wrap:wrap;gap:.3rem;}
-.pill{font-size:.58rem;padding:.18rem .5rem;border-radius:3px;border:1px solid rgba(255,255,255,.1);color:rgba(250,250,246,.4);}
-.empty{text-align:center;padding:4rem 1rem;color:rgba(250,250,246,.2);}
-.empty-icon{font-size:2.5rem;margin-bottom:.75rem;}
+/* Redes sociales */
+.socials{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;}
+.soc{display:inline-flex;align-items:center;gap:.38rem;padding:.46rem .9rem;border-radius:50px;font-size:.76rem;font-weight:500;text-decoration:none;border:1px solid;transition:filter .2s,transform .15s;backdrop-filter:blur(8px);}
+.soc:hover{filter:brightness(1.25);transform:translateY(-1px);}
+.soc-wa{color:#25d366;border-color:rgba(37,211,102,.22);background:rgba(37,211,102,.07);}
+.soc-ig{color:#e1306c;border-color:rgba(225,48,108,.22);background:rgba(225,48,108,.07);}
+.soc-fb{color:#4b8df8;border-color:rgba(75,141,248,.22);background:rgba(75,141,248,.07);}
+.soc-tk{color:#ff2d55;border-color:rgba(255,45,85,.22);background:rgba(255,45,85,.07);}
 
-/* ── MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
-.modal-bg.open{display:flex;}
-@media(min-width:600px){.modal-bg{align-items:center;}}
-.modal{background:var(--gris);border:1px solid var(--borde);border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;}
-@media(min-width:600px){.modal{border-radius:20px;}}
-.modal-img{width:100%;height:240px;object-fit:cover;display:block;}
-.modal-img-ph{width:100%;height:200px;background:var(--c-glow);display:flex;align-items:center;justify-content:center;font-size:4rem;}
-.modal-body{padding:1.5rem;}
-.modal-nombre{font-size:1.15rem;font-weight:600;margin-bottom:.3rem;}
-.modal-precio{font-size:1.1rem;color:var(--c);font-weight:500;margin-bottom:1rem;}
-.modal-desc{font-size:.86rem;color:rgba(250,250,246,.65);line-height:1.75;margin-bottom:1.25rem;}
-.modal-attrs{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.25rem;}
-.attr label{font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(250,250,246,.3);display:block;margin-bottom:.15rem;}
-.attr p{font-size:.82rem;color:rgba(250,250,246,.75);}
-.gallery-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:1.25rem;}
-.gallery-mini img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:pointer;}
-.modal-wa{display:flex;align-items:center;justify-content:center;gap:.6rem;background:#25d366;color:#fff;padding:.9rem 1.5rem;border-radius:10px;font-size:.9rem;font-weight:500;text-decoration:none;transition:background .2s;}
-.modal-wa:hover{background:#1ebe5b;}
-.modal-close-btn{position:sticky;top:0;display:flex;justify-content:flex-end;padding:.75rem 1rem 0;background:var(--gris);}
-.modal-close-btn button{background:rgba(255,255,255,.1);border:none;color:rgba(250,250,246,.6);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+/* Scroll hint */
+.scroll-hint{margin-top:2.5rem;display:flex;flex-direction:column;align-items:center;gap:.4rem;color:var(--txt-dim);animation:bob 2.2s ease-in-out infinite;}
+.scroll-hint span{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;}
+.scroll-hint svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;}
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(5px);}}
 
-/* ── SHARE BUTTON STICKY ── */
-.share-sticky{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:.6rem;}
-.share-btn{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.6rem;border-radius:50px;font-size:.88rem;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
-.share-btn-main{background:var(--c);color:#000;box-shadow:0 4px 20px var(--c-glow);}
-.share-btn-main:hover{filter:brightness(1.1);}
-.share-btn-copy{background:rgba(255,255,255,.1);color:rgba(250,250,246,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);}
-.share-btn-copy:hover{background:rgba(255,255,255,.18);}
+/* ── CATÁLOGO ── */
+.catalogo{max-width:1160px;margin:0 auto;padding:2.5rem 1rem 8rem;}
 
-/* ── LOADING ── */
-.loader{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:1rem;}
-.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--c);border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
+.cat-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.4rem;gap:.5rem;flex-wrap:wrap;padding:0 .25rem;}
+.cat-title{font-size:1.1rem;font-weight:600;letter-spacing:-.02em;}
+.cat-count{font-size:.75rem;color:var(--txt-dim);}
+
+/* Filtros de categoría */
+.cat-bar{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem .25rem .5rem;margin-bottom:1.6rem;scrollbar-width:none;}
+.cat-bar::-webkit-scrollbar{display:none;}
+.cat-chip{flex-shrink:0;padding:.38rem .85rem;border-radius:50px;font-size:.73rem;font-weight:500;cursor:pointer;border:1px solid var(--borde);background:transparent;color:var(--txt-dim);font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;}
+.cat-chip.on{background:var(--c);color:#09090700;color:#09090f;border-color:var(--c);}
+.cat-chip.on{color:#09090A;}
+.cat-chip:not(.on):hover{border-color:rgba(255,255,255,.18);color:rgba(250,250,246,.65);}
+
+/* Grid de productos — borde de 1px entre cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:0;border-top:1px solid var(--borde);border-left:1px solid var(--borde);}
+.card{background:var(--negro);cursor:pointer;display:flex;flex-direction:column;border-right:1px solid var(--borde);border-bottom:1px solid var(--borde);transition:background .2s;position:relative;overflow:hidden;}
+.card::after{content:'';position:absolute;inset:0;border:1.5px solid var(--c);opacity:0;pointer-events:none;transition:opacity .2s;}
+.card:hover{background:var(--gris2);}
+.card:hover::after{opacity:.4;}
+.card-img-wrap{aspect-ratio:3/4;overflow:hidden;position:relative;}
+.card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
+.card:hover .card-img{transform:scale(1.06);}
+.card-ph{width:100%;height:100%;background:var(--cll);display:flex;align-items:center;justify-content:center;font-size:2.2rem;}
+.card-info{padding:.8rem .85rem;}
+.card-nom{font-size:.83rem;font-weight:500;line-height:1.35;margin-bottom:.28rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.card-price{font-size:.8rem;font-weight:600;color:var(--c);margin-bottom:.4rem;}
+.card-tags{display:flex;flex-wrap:wrap;gap:.22rem;}
+.tag{font-size:.58rem;padding:.12rem .42rem;border-radius:3px;background:var(--cll);color:var(--c);letter-spacing:.01em;}
+
+.empty{grid-column:1/-1;border-right:1px solid var(--borde);border-bottom:1px solid var(--borde);display:flex;flex-direction:column;align-items:center;padding:4.5rem 1rem;color:var(--txt-dim);gap:.6rem;}
+.empty-icon{font-size:2rem;opacity:.3;}
+
+/* ── MODAL (bottom sheet) ── */
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.overlay.open{display:flex;align-items:flex-end;justify-content:center;}
+@media(min-width:640px){.overlay.open{align-items:center;}}
+.sheet{background:var(--gris);border:1px solid var(--borde);width:100%;max-width:600px;max-height:95svh;overflow-y:auto;border-radius:22px 22px 0 0;animation:slideUp .28s cubic-bezier(.22,.61,.36,1);}
+@media(min-width:640px){.sheet{border-radius:20px;max-height:90vh;}}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.sheet-drag{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:10px auto 0;cursor:ns-resize;}
+.sheet-close-row{display:flex;justify-content:flex-end;padding:.5rem .8rem 0;}
+.sheet-close{background:rgba(255,255,255,.1);border:none;color:var(--txt-dim);width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.sheet-close:hover{background:rgba(255,255,255,.18);}
+.sheet-img-wrap{overflow:hidden;max-height:260px;}
+.sheet-img{width:100%;max-height:260px;object-fit:cover;display:block;}
+.sheet-img-ph{height:180px;background:var(--cll);display:flex;align-items:center;justify-content:center;font-size:4rem;}
+.gallery-strip{display:flex;gap:6px;padding:8px 1.25rem 0;overflow-x:auto;scrollbar-width:none;}
+.gallery-strip::-webkit-scrollbar{display:none;}
+.gallery-strip img{width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;cursor:zoom-in;border:1.5px solid transparent;transition:border-color .2s;}
+.gallery-strip img:hover{border-color:var(--c);}
+.sheet-body{padding:1.25rem;}
+.sheet-name{font-size:1.1rem;font-weight:600;letter-spacing:-.015em;margin-bottom:.28rem;}
+.sheet-price{font-size:1.25rem;font-weight:600;color:var(--c);margin-bottom:.85rem;}
+.sheet-desc{font-size:.85rem;color:var(--txt);line-height:1.78;margin-bottom:1.1rem;}
+.sheet-attrs{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;background:var(--gris2);border-radius:12px;padding:.9rem 1rem;margin-bottom:1.1rem;}
+.s-attr label{font-size:.59rem;letter-spacing:.08em;text-transform:uppercase;color:var(--txt-dim);display:block;margin-bottom:.18rem;}
+.s-attr p{font-size:.82rem;color:rgba(250,250,246,.8);}
+.sheet-wa{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#1db954;background:#25d366;color:#fff;padding:.95rem 1.5rem;border-radius:12px;font-size:.9rem;font-weight:500;text-decoration:none;transition:filter .2s;}
+.sheet-wa:hover{filter:brightness(1.08);}
+
+/* ── FAB COMPARTIR ── */
+.fab{position:fixed;bottom:1.4rem;right:1.2rem;z-index:300;display:flex;flex-direction:column;align-items:flex-end;gap:.45rem;}
+.fab-menu{display:flex;flex-direction:column;gap:.38rem;align-items:flex-end;opacity:0;pointer-events:none;transform:translateY(8px);transition:all .22s cubic-bezier(.22,.61,.36,1);}
+.fab-menu.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.fab-item{display:flex;align-items:center;gap:.45rem;padding:.52rem 1rem;border-radius:50px;border:1px solid var(--borde);background:rgba(22,22,17,.92);backdrop-filter:blur(14px);color:rgba(250,250,246,.78);font-size:.78rem;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .18s;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.fab-item:hover{background:rgba(35,35,25,.95);color:var(--blanco);}
+.fab-btn{display:flex;align-items:center;gap:.42rem;padding:.72rem 1.2rem;border-radius:50px;border:none;cursor:pointer;font-size:.84rem;font-weight:500;font-family:'DM Sans',sans-serif;background:var(--c);color:#09090A;box-shadow:0 4px 22px var(--cl);transition:filter .2s,transform .15s;}
+.fab-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.fab-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── FOOTER SIMPLE ── */
+.foot{text-align:center;padding:1.5rem;font-size:.72rem;color:var(--txt-dim);}
+.foot a{color:var(--c);text-decoration:none;opacity:.7;}
 
 @media(max-width:480px){
-  .hero-nombre{font-size:1.6rem;}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));}
-  .modal-attrs{grid-template-columns:1fr;}
+  .grid{grid-template-columns:repeat(2,1fr);}
+  .sheet-attrs{grid-template-columns:1fr;}
+}
+@media(min-width:900px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
 }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a href="emprende.html">← GeoOrigen Emprende</a>
-  <span class="topbar-logo">GeoOrigen</span>
+<div id="loader"><div class="spin"></div><span style="font-size:.75rem;color:var(--txt-dim)">Cargando...</span></div>
+
+<!-- TOPBAR -->
+<nav id="topbar">
+  <a class="tb-back" href="emprende.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    GeoOrigen Emprende
+  </a>
+  <span class="tb-logo">geoorigen.com</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-tint"></div>
+  <div class="hero-content">
+    <div class="logo-wrap">
+      <div class="logo-ring1"></div>
+      <div class="logo-ring2"></div>
+      <div class="logo-ring3"></div>
+      <div id="heroLogo" style="width:100%;height:100%;border-radius:50%;overflow:hidden;position:relative;z-index:1;"></div>
+    </div>
+    <div class="hero-eyebrow">Emprendedor GeoOrigen</div>
+    <h1 class="hero-name" id="heroNombre"></h1>
+    <div class="hero-city" id="heroCity" style="display:none">
+      <div class="hero-city-dot"></div>
+      <span id="heroCityTxt"></span>
+    </div>
+    <p class="hero-desc" id="heroDesc" style="display:none"></p>
+    <div class="socials" id="heroSocials"></div>
+    <div class="scroll-hint" id="scrollHint">
+      <span>Ver catálogo</span>
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- CATÁLOGO -->
+<section class="catalogo" id="catalogoSection" style="display:none">
+  <div class="cat-header">
+    <div class="cat-title" id="catTitle">Catálogo</div>
+    <div class="cat-count" id="catCount"></div>
+  </div>
+  <div class="cat-bar" id="catBar"></div>
+  <div class="grid" id="prodGrid"></div>
+</section>
+
+<div class="foot" id="foot" style="display:none">
+  <a href="https://geoorigen.com">geoorigen.com</a> · Emprende con identidad de origen
 </div>
 
-<div class="loader" id="loader"><div class="spinner"></div><span style="font-size:.8rem;color:rgba(250,250,246,.3)">Cargando...</span></div>
-<div id="appWrap" style="display:none">
-
-  <!-- HERO -->
-  <section class="hero" id="heroSection">
-    <div class="hero-bg" id="heroBg"></div>
-    <div class="hero-gradient"></div>
-    <div class="hero-bottom"></div>
-    <div class="hero-inner">
-      <div id="heroLogo"></div>
-      <div class="hero-nombre" id="heroNombre"></div>
-      <div class="hero-ciudad" id="heroCiudad"></div>
-      <div class="hero-desc" id="heroDesc"></div>
-      <div class="socials" id="heroSocials"></div>
-    </div>
-  </section>
-
-  <!-- PRODUCTOS -->
-  <section class="prods">
-    <div class="prods-head">
-      <span class="prods-title" id="prodCount"></span>
-      <div class="cat-scroll" id="catScroll"></div>
-    </div>
-    <div class="grid" id="prodGrid"></div>
-  </section>
-
-</div>
-
-<!-- MODAL -->
-<div class="modal-bg" id="modalBg" onclick="if(event.target===this)cerrarModal()">
-  <div class="modal" id="modal">
-    <div class="modal-close-btn"><button onclick="cerrarModal()">✕</button></div>
-    <div id="mMedia"></div>
-    <div class="modal-body">
-      <div class="gallery-mini" id="mGallery" style="display:none"></div>
-      <div class="modal-nombre" id="mNombre"></div>
-      <div class="modal-precio" id="mPrecio"></div>
-      <div class="modal-desc" id="mDesc"></div>
-      <div class="modal-attrs" id="mAttrs"></div>
-      <a class="modal-wa" id="mWA" href="#" target="_blank" rel="noopener" style="display:none">
-        💬 Pedir por WhatsApp
+<!-- MODAL producto -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)cerrarModal()">
+  <div class="sheet" id="sheet">
+    <div class="sheet-drag"></div>
+    <div class="sheet-close-row"><button class="sheet-close" onclick="cerrarModal()">✕</button></div>
+    <div id="sheetMedia"></div>
+    <div class="gallery-strip" id="sheetGallery" style="display:none"></div>
+    <div class="sheet-body">
+      <div class="sheet-name" id="sheetName"></div>
+      <div class="sheet-price" id="sheetPrice"></div>
+      <div class="sheet-desc" id="sheetDesc" style="display:none"></div>
+      <div class="sheet-attrs" id="sheetAttrs"></div>
+      <a class="sheet-wa" id="sheetWA" href="#" target="_blank" rel="noopener" style="display:none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.123 1.532 5.857L.057 23.57a.5.5 0 0 0 .61.61l5.71-1.474A11.953 11.953 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.68-.508-5.22-1.396l-.376-.22-3.89 1.004 1.029-3.762-.242-.388A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Contactar por WhatsApp
       </a>
     </div>
   </div>
 </div>
 
-<!-- SHARE STICKY -->
-<div class="share-sticky" id="shareSticky" style="display:none">
-  <button class="share-btn share-btn-main" onclick="compartir()">📤 Compartir</button>
-  <button class="share-btn share-btn-copy" onclick="copiarEnlace()">🔗 Copiar enlace</button>
+<!-- FAB COMPARTIR -->
+<div class="fab" id="fab" style="display:none">
+  <div class="fab-menu" id="fabMenu">
+    <button class="fab-item" onclick="compartirNativo()">
+      <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      Compartir página
+    </button>
+    <button class="fab-item" id="fabCopy" onclick="copiarEnlace()">
+      <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copiar enlace
+    </button>
+  </div>
+  <button class="fab-btn" id="fabBtn" onclick="toggleFab()">
+    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    Compartir
+  </button>
 </div>
 
 <script>
 const SUPA_URL  = 'https://kubcmjbiaithfvozmdul.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YmNtamJpYWl0aGZ2b3ptZHVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjI0MzAsImV4cCI6MjA4OTE5ODQzMH0.GoT7vRuwEv7P2mJU1hqIzAXnaNdm4ji-DQM-2WU7WOM';
 
-const CAT_LABEL = {detalles:'🎁 Detalles',arte:'🎨 Arte',peluches:'🧸 Peluches',termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',papeleria:'📚 Papelería',reposteria:'🍰 Repostería',san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'};
+const CAT = {
+  detalles:'🎁 Detalles',arte:'🎨 Arte y pintura',peluches:'🧸 Peluches',
+  termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',
+  flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',
+  papeleria:'📚 Papelería',reposteria:'🍰 Repostería',
+  san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',
+  dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'
+};
 
-const params  = new URLSearchParams(location.search);
-const slug    = params.get('e');
-const idParam = params.get('id');
+// Leer slug desde path /emprendedor/:slug o query ?e=slug o ?id=uuid
+const pathMatch = location.pathname.match(/\/emprendedor\/([^\/]+)\/?$/);
+const pathSlug  = pathMatch ? pathMatch[1] : null;
+const qp        = new URLSearchParams(location.search);
+const slug      = pathSlug || qp.get('e');
+const idParam   = qp.get('id');
 
-let emp  = null;
-let prods = [];
-let catActiva = '';
+let emp = null, prods = [], catActiva = '', fabOpen = false;
 
-// ── Helpers fetch ─────────────────────────────────────────────────────────────
-function sbFetch(path) {
+function sbGet(path) {
   return fetch(`${SUPA_URL}/rest/v1/${path}`, {
     headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` }
   }).then(r => r.json());
 }
 
-// ── Cargar datos ──────────────────────────────────────────────────────────────
+// ── CARGAR ────────────────────────────────────────────────────────────────────
 async function cargar() {
-  let empFilter;
-  if (slug)    empFilter = `slug=eq.${encodeURIComponent(slug)}&activo=eq.true`;
-  else if (idParam) empFilter = `id=eq.${idParam}&activo=eq.true`;
+  let filter;
+  if (slug)         filter = `slug=eq.${encodeURIComponent(slug)}&activo=eq.true`;
+  else if (idParam) filter = `id=eq.${idParam}&activo=eq.true`;
   else { mostrarError('URL inválida'); return; }
 
   const [empArr, prodArr] = await Promise.all([
-    sbFetch(`emprendedores?${empFilter}&select=*`),
-    sbFetch(`emprende_productos?activo=eq.true&order=creado_en.desc&select=*`)
-      .then(arr => {
-        // filtrar por emprendedor después de saber el id
-        return arr; // se filtra abajo
-      })
+    sbGet(`emprendedores?${filter}&select=*`),
+    sbGet('emprende_productos?activo=eq.true&select=*')
   ]);
 
-  if (!empArr.length) { mostrarError('Este emprendimiento no está disponible.'); return; }
-  emp = empArr[0];
+  if (!empArr || !empArr.length) { mostrarError('Este emprendimiento no está disponible.'); return; }
+  emp   = empArr[0];
+  prods = (prodArr || []).filter(p => p.emprendedor_id === emp.id);
 
-  // Filtrar productos de este emprendedor
-  const allProds = await sbFetch(`emprende_productos?emprendedor_id=eq.${emp.id}&activo=eq.true&order=creado_en.desc&select=*`);
-  prods = allProds || [];
-
-  // Aplicar color personalizado
+  // Color personalizado
   const color = emp.color_primario || '#8FBC5A';
   document.documentElement.style.setProperty('--c', color);
 
   document.title = `${emp.nombre_emprendimiento} — GeoOrigen Emprende`;
+  document.querySelector('meta[name="description"]').content =
+    `${emp.descripcion || emp.nombre_emprendimiento} — GeoOrigen Emprende`;
 
   renderHero();
   renderCats();
   renderGrid();
 
   document.getElementById('loader').style.display = 'none';
-  document.getElementById('appWrap').style.display = '';
-  document.getElementById('shareSticky').style.display = 'flex';
+  document.getElementById('catalogoSection').style.display = '';
+  document.getElementById('foot').style.display = '';
+  document.getElementById('fab').style.display = '';
+
+  // Scroll listener para topbar + ocultar scroll hint
+  window.addEventListener('scroll', () => {
+    document.getElementById('topbar').classList.toggle('solid', window.scrollY > 60);
+    if (window.scrollY > 80) document.getElementById('scrollHint').style.opacity = '0';
+    else document.getElementById('scrollHint').style.opacity = '';
+    // Cerrar FAB al hacer scroll
+    if (fabOpen) toggleFab();
+  }, { passive: true });
+
+  // Cerrar FAB al hacer click fuera
+  document.addEventListener('click', e => {
+    if (fabOpen && !document.getElementById('fab').contains(e.target)) toggleFab();
+  });
 }
 
-// ── Hero ─────────────────────────────────────────────────────────────────────
+// ── HERO ──────────────────────────────────────────────────────────────────────
 function renderHero() {
-  // Banner
+  // Banner de fondo
   const banner = emp.banner_url || (prods[0]?.foto_principal_url) || '';
-  if (banner) document.getElementById('heroBg').style.backgroundImage = `url('${banner}')`;
-  else {
-    document.getElementById('heroBg').style.background =
-      `linear-gradient(135deg, color-mix(in srgb, ${emp.color_primario||'#8FBC5A'} 40%, #0E0E0A) 0%, #0E0E0A 100%)`;
+  const bg = document.getElementById('heroBg');
+  if (banner) {
+    bg.style.backgroundImage = `url('${banner}')`;
+  } else {
+    bg.style.background = `linear-gradient(140deg,
+      color-mix(in srgb,${emp.color_primario||'#8FBC5A'} 35%,#09090A) 0%,
+      #09090A 100%)`;
   }
 
   // Logo
-  document.getElementById('heroLogo').innerHTML = emp.logo_url
-    ? `<img src="${emp.logo_url}" class="hero-logo" alt="Logo">`
-    : `<div class="hero-logo-ph">🏪</div>`;
+  const logoEl = document.getElementById('heroLogo');
+  if (emp.logo_url) {
+    logoEl.innerHTML = `<img class="logo-img" src="${emp.logo_url}" alt="Logo de ${emp.nombre_emprendimiento}">`;
+  } else {
+    logoEl.innerHTML = `<div class="logo-ph">🏪</div>`;
+  }
 
   document.getElementById('heroNombre').textContent = emp.nombre_emprendimiento;
-  document.getElementById('heroCiudad').innerHTML = emp.ciudad ? `<span>📍</span><span>${emp.ciudad}</span>` : '';
-  document.getElementById('heroDesc').textContent  = emp.descripcion || '';
+
+  if (emp.ciudad) {
+    document.getElementById('heroCityTxt').textContent = emp.ciudad;
+    document.getElementById('heroCity').style.display = '';
+  }
+  if (emp.descripcion) {
+    document.getElementById('heroDesc').textContent = emp.descripcion;
+    document.getElementById('heroDesc').style.display = '';
+  }
 
   // Redes sociales
-  const redes = [];
-  if (emp.whatsapp)  redes.push(`<a class="soc soc-wa" href="https://wa.me/${emp.whatsapp}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
-  if (emp.instagram) redes.push(`<a class="soc soc-ig" href="https://instagram.com/${emp.instagram.replace('@','')}" target="_blank" rel="noopener">📸 Instagram</a>`);
-  if (emp.facebook)  redes.push(`<a class="soc soc-fb" href="${emp.facebook}" target="_blank" rel="noopener">👍 Facebook</a>`);
-  if (emp.tiktok)    redes.push(`<a class="soc soc-tk" href="https://tiktok.com/@${emp.tiktok.replace('@','')}" target="_blank" rel="noopener">🎵 TikTok</a>`);
-  document.getElementById('heroSocials').innerHTML = redes.join('');
+  const links = [];
+  if (emp.whatsapp)  links.push(`<a class="soc soc-wa" href="https://wa.me/${emp.whatsapp}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
+  if (emp.instagram) links.push(`<a class="soc soc-ig" href="https://instagram.com/${emp.instagram.replace('@','')}" target="_blank" rel="noopener">📸 Instagram</a>`);
+  if (emp.facebook)  links.push(`<a class="soc soc-fb" href="${emp.facebook.startsWith('http')?emp.facebook:'https://facebook.com/'+emp.facebook}" target="_blank" rel="noopener">👍 Facebook</a>`);
+  if (emp.tiktok)    links.push(`<a class="soc soc-tk" href="https://tiktok.com/@${emp.tiktok.replace('@','')}" target="_blank" rel="noopener">🎵 TikTok</a>`);
+  document.getElementById('heroSocials').innerHTML = links.join('');
 }
 
-// ── Categorías ────────────────────────────────────────────────────────────────
+// ── CATEGORÍAS ────────────────────────────────────────────────────────────────
 function renderCats() {
   const cats = [...new Set(prods.map(p => p.categoria))].filter(Boolean);
-  const scroll = document.getElementById('catScroll');
-  if (cats.length < 2) { scroll.style.display = 'none'; return; }
-  scroll.innerHTML = `<button class="cat-btn on" onclick="filtrarCat('',this)">Todos</button>`
-    + cats.map(c => `<button class="cat-btn" onclick="filtrarCat('${c}',this)">${CAT_LABEL[c]||c}</button>`).join('');
+  const bar  = document.getElementById('catBar');
+  if (cats.length < 2) { bar.style.display = 'none'; return; }
+  bar.innerHTML = `<button class="cat-chip on" onclick="filtrar('',this)">Todos</button>`
+    + cats.map(c => `<button class="cat-chip" onclick="filtrar('${c}',this)">${CAT[c]||c}</button>`).join('');
+  document.getElementById('catTitle').textContent = `Catálogo de ${emp.nombre_emprendimiento}`;
 }
 
-function filtrarCat(cat, btn) {
+function filtrar(cat, btn) {
   catActiva = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   renderGrid();
 }
 
-// ── Grid ──────────────────────────────────────────────────────────────────────
+// ── GRID ──────────────────────────────────────────────────────────────────────
 function renderGrid() {
   const lista = catActiva ? prods.filter(p => p.categoria === catActiva) : prods;
-  document.getElementById('prodCount').textContent = `${lista.length} producto${lista.length !== 1?'s':''}`;
-  if (!lista.length) {
-    document.getElementById('prodGrid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🛍️</div><p>Sin productos en esta categoría</p></div>';
+  const n = lista.length;
+  document.getElementById('catCount').textContent = n
+    ? `${n} producto${n!==1?'s':''}`
+    : '';
+  if (!n) {
+    document.getElementById('prodGrid').innerHTML =
+      `<div class="empty"><div class="empty-icon">🛍️</div><span>Sin productos en esta categoría</span></div>`;
     return;
   }
-  document.getElementById('prodGrid').innerHTML = lista.map((p,i) => {
-    const idx = prods.indexOf(p);
+  document.getElementById('prodGrid').innerHTML = lista.map((p, i) => {
+    const idx    = prods.indexOf(p);
     const precio = p.precio ? `$${Number(p.precio).toLocaleString('es-CO')}` : 'Consultar precio';
-    const pills = [
-      p.personalizable ? '<span class="pill">✨ Personalizable</span>' : '',
-      p.hace_envios    ? '<span class="pill">🚚 Envíos</span>' : '',
-      p.disponibilidad==='inmediata' ? '<span class="pill">⚡ Inmediata</span>' : '<span class="pill">🔧 Bajo pedido</span>',
+    const tags   = [
+      p.personalizable ? '<span class="tag">✨ Personalizable</span>' : '',
+      p.hace_envios    ? '<span class="tag">🚚 Envíos</span>' : '',
+      p.disponibilidad === 'inmediata' ? '<span class="tag">⚡ Inmediato</span>' : '',
     ].filter(Boolean).join('');
     return `<div class="card" onclick="abrirModal(${idx})">
-      ${p.foto_principal_url
-        ? `<img class="card-img" src="${p.foto_principal_url}" alt="${p.nombre}" loading="lazy">`
-        : `<div class="card-img-ph">📦</div>`}
-      <div class="card-body">
-        <div class="card-nombre">${p.nombre}</div>
-        <div class="card-precio">${precio}</div>
-        <div class="card-pills">${pills}</div>
+      <div class="card-img-wrap">
+        ${p.foto_principal_url
+          ? `<img class="card-img" src="${p.foto_principal_url}" alt="${p.nombre}" loading="${i<4?'eager':'lazy'}">`
+          : `<div class="card-ph">📦</div>`}
+      </div>
+      <div class="card-info">
+        <div class="card-nom">${p.nombre}</div>
+        <div class="card-price">${precio}</div>
+        ${tags ? `<div class="card-tags">${tags}</div>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
+// ── MODAL ─────────────────────────────────────────────────────────────────────
 function abrirModal(idx) {
-  const p = prods[idx];
+  const p     = prods[idx];
   const fotos = [p.foto_principal_url, ...(p.galeria_urls||[])].filter(Boolean);
 
-  // Foto principal grande
-  document.getElementById('mMedia').innerHTML = fotos.length
-    ? `<img src="${fotos[0]}" class="modal-img" alt="${p.nombre}">`
-    : `<div class="modal-img-ph">📦</div>`;
+  document.getElementById('sheetMedia').innerHTML = fotos.length
+    ? `<div class="sheet-img-wrap"><img class="sheet-img" src="${fotos[0]}" alt="${p.nombre}"></div>`
+    : `<div class="sheet-img-ph">📦</div>`;
 
-  // Galería mini (fotos 2+)
-  const galEl = document.getElementById('mGallery');
+  const gal = document.getElementById('sheetGallery');
   if (fotos.length > 1) {
-    galEl.style.display = 'grid';
-    galEl.innerHTML = fotos.slice(1).map(u =>
-      `<img src="${u}" alt="" onclick="window.open('${u}','_blank')">`).join('');
-  } else { galEl.style.display = 'none'; }
+    gal.style.display = 'flex';
+    gal.innerHTML = fotos.slice(1).map(u => `<img src="${u}" onclick="window.open('${u}','_blank')" loading="lazy">`).join('');
+  } else { gal.style.display = 'none'; }
 
-  document.getElementById('mNombre').textContent = p.nombre;
-  document.getElementById('mPrecio').textContent  = p.precio ? `$${Number(p.precio).toLocaleString('es-CO')}` : 'Consultar precio';
-  document.getElementById('mDesc').textContent    = p.descripcion || '';
+  document.getElementById('sheetName').textContent  = p.nombre;
+  document.getElementById('sheetPrice').textContent = p.precio ? `$${Number(p.precio).toLocaleString('es-CO')}` : 'Consultar precio';
+
+  const desc = document.getElementById('sheetDesc');
+  if (p.descripcion) { desc.textContent = p.descripcion; desc.style.display = ''; }
+  else desc.style.display = 'none';
 
   const attrs = [
-    p.disponibilidad ? {l:'Disponibilidad', v: p.disponibilidad==='inmediata'?'⚡ Entrega inmediata':p.disponibilidad==='pedido'?'🔧 Solo bajo pedido':'Inmediata o bajo pedido'} : null,
-    p.personalizable ? {l:'Personalización', v: p.que_personalizar||'Sí'} : null,
-    p.tiempo_elaboracion ? {l:'Tiempo elaboración', v: p.tiempo_elaboracion} : null,
-    p.ciudad ? {l:'Ciudad', v: p.ciudad} : null,
-    p.hace_envios ? {l:'Envíos', v: p.tiempo_entrega||'Sí'} : null,
-    p.categoria ? {l:'Categoría', v: CAT_LABEL[p.categoria]||p.categoria} : null,
+    p.disponibilidad     ? {l:'Disponibilidad', v: p.disponibilidad==='inmediata'?'⚡ Entrega inmediata':p.disponibilidad==='pedido'?'🔧 Bajo pedido':'Inmediata o pedido'} : null,
+    p.personalizable     ? {l:'Personalización', v: p.que_personalizar||'Sí, personalizable'} : null,
+    p.tiempo_elaboracion ? {l:'Elaboración', v: p.tiempo_elaboracion} : null,
+    p.hace_envios        ? {l:'Envíos', v: p.tiempo_entrega||'Disponible'} : null,
+    p.ciudad             ? {l:'Ciudad', v: p.ciudad} : null,
+    p.categoria          ? {l:'Categoría', v: CAT[p.categoria]||p.categoria} : null,
   ].filter(Boolean);
-  document.getElementById('mAttrs').innerHTML = attrs.map(a =>
-    `<div class="attr"><label>${a.l}</label><p>${a.v}</p></div>`).join('');
+  document.getElementById('sheetAttrs').innerHTML = attrs.map(a =>
+    `<div class="s-attr"><label>${a.l}</label><p>${a.v}</p></div>`).join('');
 
-  const wa = emp.whatsapp || '';
-  const waEl = document.getElementById('mWA');
-  if (wa) {
-    const msg = encodeURIComponent(`Hola ${emp.nombre_emprendimiento}, vi tu producto "${p.nombre}" en GeoOrigen y me interesa 😊`);
-    waEl.href = `https://wa.me/${wa}?text=${msg}`;
+  const waEl = document.getElementById('sheetWA');
+  if (emp.whatsapp) {
+    const msg = encodeURIComponent(`Hola ${emp.nombre_emprendimiento} 👋, vi tu producto "${p.nombre}" en GeoOrigen Emprende y me interesa 🛍️`);
+    waEl.href = `https://wa.me/${emp.whatsapp}?text=${msg}`;
     waEl.style.display = 'flex';
   } else { waEl.style.display = 'none'; }
 
-  document.getElementById('modalBg').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
 function cerrarModal() {
-  document.getElementById('modalBg').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// ── Compartir ─────────────────────────────────────────────────────────────────
+// ── FAB COMPARTIR ─────────────────────────────────────────────────────────────
 function miUrl() {
-  return slug
-    ? `${location.origin}${location.pathname}?e=${slug}`
-    : `${location.origin}${location.pathname}?id=${emp.id}`;
+  // Preferir geoorigen.com/emprendedor/slug como URL canónica
+  if (emp.slug) return `https://geoorigen.com/emprendedor/${emp.slug}`;
+  if (slug)     return `${location.origin}${location.pathname.replace(/\/emprendedor\/.*$/,'')}?e=${slug}`;
+  return `${location.origin}${location.pathname}?id=${emp.id}`;
 }
 
-function compartir() {
+function toggleFab() {
+  fabOpen = !fabOpen;
+  document.getElementById('fabMenu').classList.toggle('open', fabOpen);
+  document.getElementById('fabBtn').style.background = fabOpen ? 'var(--cd)' : 'var(--c)';
+}
+
+function compartirNativo() {
   const url = miUrl();
   if (navigator.share) {
     navigator.share({
       title: emp.nombre_emprendimiento,
       text: `Conoce ${emp.nombre_emprendimiento} en GeoOrigen Emprende 🛍️`,
       url
-    }).catch(() => {});
-  } else {
-    copiarEnlace();
-  }
+    }).catch(()=>{});
+  } else { copiarEnlace(); }
+  if (fabOpen) toggleFab();
 }
 
-let copyTimer;
+let copyT;
 function copiarEnlace() {
   navigator.clipboard.writeText(miUrl()).then(() => {
-    const btn = document.querySelector('.share-btn-copy');
-    btn.textContent = '✓ Copiado';
-    clearTimeout(copyTimer);
-    copyTimer = setTimeout(() => btn.textContent = '🔗 Copiar enlace', 2500);
-  });
+    const btn = document.getElementById('fabCopy');
+    btn.textContent = '✓ ¡Copiado!';
+    clearTimeout(copyT);
+    copyT = setTimeout(() => {
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar enlace`;
+    }, 2500);
+  }).catch(()=>{});
+  if (fabOpen) toggleFab();
 }
 
 function mostrarError(msg) {
-  document.getElementById('loader').innerHTML = `<div style="text-align:center;padding:2rem"><div style="font-size:3rem;margin-bottom:1rem">😕</div><p style="color:rgba(250,250,246,.4);font-size:.9rem">${msg}</p><a href="emprende.html" style="color:var(--c);font-size:.85rem;text-decoration:none;margin-top:1rem;display:inline-block">← Volver a Emprende</a></div>`;
+  document.getElementById('loader').innerHTML = `
+    <div style="text-align:center;padding:2rem;max-width:320px">
+      <div style="font-size:2.5rem;margin-bottom:1rem;opacity:.4">😕</div>
+      <p style="color:var(--txt-dim);font-size:.9rem;line-height:1.6;margin-bottom:1.5rem">${msg}</p>
+      <a href="emprende.html" style="color:var(--c);font-size:.85rem;text-decoration:none;border:1px solid var(--cl);padding:.5rem 1.2rem;border-radius:50px;">
+        ← Volver a Emprende
+      </a>
+    </div>`;
 }
 
 cargar();
