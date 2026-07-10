@@ -271,7 +271,7 @@ let catActual = 'todos';
 const CAT_CAMPO = { miel:'Miel y Apicultura', cafe:'Café y Derivados', lacteos:'Lácteos y Quesos', frutas:'Frutas', platano:'Plátano y Banano', hortalizas:'Hortalizas', procesados:'Artesanales y Procesados', otro:'Otros' };
 const CAT_CAMPO_ORDER = ['miel','cafe','lacteos','frutas','platano','hortalizas','procesados','otro'];
 
-const CAT_EMP = {
+let CAT_EMP = {
   detalles:'🎁 Detalles y regalos', arte:'🎨 Arte y pintura', peluches:'🧸 Peluches',
   termos:'☕ Termos y mugs', decoracion:'🕯️ Decoración para el hogar', joyeria:'💍 Joyería y accesorios',
   flores:'🌸 Flores y arreglos', eventos:'🎉 Decoración para eventos', manualidades:'✨ Manualidades',
@@ -282,16 +282,24 @@ const CAT_EMP = {
 // ── Carga ──────────────────────────────────────────────────────────────────────
 async function cargar() {
   try {
-    const [rc, re, remp] = await Promise.all([
+    const [rc, re, remp, rcat] = await Promise.all([
       fetch(SUPA_URL + '/rest/v1/productos?activa=eq.true&order=destacado.desc,fecha_actualizacion.desc' +
         '&select=id,slug,nombre,descripcion_corta,descripcion,categoria,foto_portada_url,precio_desde,precio_hasta,unidad_base,nombre_productor,finca_slug,municipio,departamento,whatsapp,presentaciones,destacado', { headers: H }),
       fetch(SUPA_URL + '/rest/v1/emprende_productos?activo=eq.true&order=creado_en.desc' +
         '&select=id,nombre,categoria,precio,descripcion,foto_principal_url,galeria_urls,personalizable,que_personalizar,tiempo_elaboracion,disponibilidad,ciudad,hace_envios,tiempo_entrega,emprendedor_id,emprendedores(nombre_emprendimiento,logo_url,whatsapp,instagram,facebook,ciudad)', { headers: H }),
       fetch(SUPA_URL + '/rest/v1/emprendedores?activo=eq.true&select=id,nombre_emprendimiento,logo_url,banner_url,ciudad,descripcion,slug,color_primario,whatsapp', { headers: H }),
+      fetch(SUPA_URL + '/rest/v1/categorias_emprende?activo=eq.true&order=orden&select=slug,nombre,emoji', { headers: H }),
     ]);
-    campoProd        = rc.ok   ? await rc.json()   : [];
-    emprendeProd     = re.ok   ? await re.json()   : [];
+    campoProd         = rc.ok   ? await rc.json()   : [];
+    emprendeProd      = re.ok   ? await re.json()   : [];
     emprendedoresList = remp.ok ? await remp.json() : [];
+    if (rcat.ok) {
+      const cats = await rcat.json();
+      if (cats.length) {
+        CAT_EMP = {};
+        cats.forEach(c => { CAT_EMP[c.slug] = `${c.emoji} ${c.nombre}`.trim(); });
+      }
+    }
   } catch(e) { campoProd = []; emprendeProd = []; emprendedoresList = []; }
   buildCatTabs();
   filtrar();

@@ -292,22 +292,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
             <div class="fg"><label class="fl">Categoría *</label>
               <select class="fsl" id="fpCat">
                 <option value="">— Selecciona —</option>
-                <option value="detalles">🎁 Detalles y regalos</option>
-                <option value="arte">🎨 Arte y pintura</option>
-                <option value="peluches">🧸 Peluches</option>
-                <option value="termos">☕ Termos y mugs personalizados</option>
-                <option value="decoracion">🕯️ Decoración para el hogar</option>
-                <option value="joyeria">💍 Joyería y accesorios</option>
-                <option value="flores">🌸 Flores y arreglos</option>
-                <option value="eventos">🎉 Decoración para eventos</option>
-                <option value="manualidades">✨ Manualidades</option>
-                <option value="papeleria">📚 Papelería creativa</option>
-                <option value="reposteria">🍰 Repostería y dulces</option>
-                <option value="san_valentin">❤️ San Valentín</option>
-                <option value="dia_madre">👩 Día de la Madre</option>
-                <option value="dia_padre">👨 Día del Padre</option>
-                <option value="navidad">🎄 Navidad</option>
-                <option value="cumpleanos">🎂 Cumpleaños</option>
               </select>
             </div>
             <div class="fg"><label class="fl">Precio (COP)</label>
@@ -574,6 +558,7 @@ const sb = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 // ── Estado ─────────────────────────────────────────────────────────────────────
 let emprendedor = null;   // fila de emprendedores
+let CAT = {};             // {slug: 'emoji nombre'} cargado desde categorias_emprende
 let misProductos = [];
 let editandoId = null;    // null = nuevo, uuid = editar
 let fotos = [];           // array de URLs (max 3)
@@ -632,6 +617,24 @@ async function doReset() {
   volverLogin();
 }
 
+// ── Categorías dinámicas ───────────────────────────────────────────────────────
+async function cargarCategorias() {
+  const { data } = await sb.from('categorias_emprende').select('slug,nombre,emoji,activo').order('orden').order('nombre');
+  if (!data) return;
+  CAT = {};
+  const sel = document.getElementById('fpCat');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Selecciona —</option>';
+  data.filter(c => c.activo).forEach(c => {
+    CAT[c.slug] = `${c.emoji} ${c.nombre}`.trim();
+    const opt = document.createElement('option');
+    opt.value = c.slug;
+    opt.textContent = `${c.emoji} ${c.nombre}`.trim();
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
 // ── Iniciar app ────────────────────────────────────────────────────────────────
 async function iniciarApp() {
   const { data: { user } } = await sb.auth.getUser();
@@ -651,6 +654,7 @@ async function iniciarApp() {
   document.getElementById('app').style.display = 'block';
   document.getElementById('tbNombre').textContent = emprendedor.nombre_emprendimiento;
 
+  cargarCategorias();
   cargarProductos();
   renderDashboard();
 }
@@ -749,7 +753,6 @@ async function cargarProductos() {
 
 // ── Render lista ───────────────────────────────────────────────────────────────
 function prodItemHTML(p) {
-  const CAT = {detalles:'🎁 Detalles',arte:'🎨 Arte',peluches:'🧸 Peluches',termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',papeleria:'📚 Papelería',reposteria:'🍰 Repostería',san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'};
   const precio = p.precio ? '$' + Number(p.precio).toLocaleString('es-CO') : 'Sin precio';
   return `<div class="prod-item">
     ${p.foto_principal_url ? `<img class="prod-thumb" src="${p.foto_principal_url}" alt="${p.nombre}">` : `<div class="prod-thumb-ph">📦</div>`}
