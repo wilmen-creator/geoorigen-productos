@@ -270,14 +270,7 @@ body.fondo-color-intenso{--cat-bg:color-mix(in srgb,var(--c) 50%,#0A0A08);--card
 const SUPA_URL  = 'https://kubcmjbiaithfvozmdul.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YmNtamJpYWl0aGZ2b3ptZHVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MjI0MzAsImV4cCI6MjA4OTE5ODQzMH0.GoT7vRuwEv7P2mJU1hqIzAXnaNdm4ji-DQM-2WU7WOM';
 
-const CAT = {
-  detalles:'🎁 Detalles',arte:'🎨 Arte y pintura',peluches:'🧸 Peluches',
-  termos:'☕ Termos',decoracion:'🕯️ Decoración',joyeria:'💍 Joyería',
-  flores:'🌸 Flores',eventos:'🎉 Eventos',manualidades:'✨ Manualidades',
-  papeleria:'📚 Papelería',reposteria:'🍰 Repostería',
-  san_valentin:'❤️ San Valentín',dia_madre:'👩 Día Madre',
-  dia_padre:'👨 Día Padre',navidad:'🎄 Navidad',cumpleanos:'🎂 Cumpleaños'
-};
+let CAT = {}; // se carga dinámicamente desde categorias_emprendedor
 
 // Leer slug desde path /emprendedor/:slug o query ?e=slug o ?id=uuid
 const pathMatch = location.pathname.match(/\/emprendedor\/([^\/]+)\/?$/);
@@ -309,6 +302,11 @@ async function cargar() {
   if (!empArr || !empArr.length) { mostrarError('Este emprendimiento no está disponible.'); return; }
   emp   = empArr[0];
   prods = (prodArr || []).filter(p => p.emprendedor_id === emp.id);
+
+  // Cargar categorías propias del emprendedor
+  const catArr = await sbGet(`categorias_emprendedor?emprendedor_id=eq.${emp.id}&activo=eq.true&order=orden&select=slug,nombre,emoji`);
+  CAT = {};
+  (catArr || []).forEach(c => { CAT[c.slug] = `${c.emoji} ${c.nombre}`.trim(); });
 
   // Color personalizado
   const color = emp.color_primario || '#8FBC5A';

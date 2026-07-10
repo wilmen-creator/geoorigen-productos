@@ -207,6 +207,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
     <div class="sb-item" id="sb-nuevo" onclick="nav('nuevo')">
       <span class="sb-icon">➕</span> Nuevo producto
     </div>
+    <div class="sb-item" id="sb-categorias" onclick="nav('categorias')">
+      <span class="sb-icon">🏷️</span> Mis categorías
+    </div>
     <div class="sb-divider"></div>
     <div class="sb-item" id="sb-perfil" onclick="nav('perfil')">
       <span class="sb-icon">🏪</span> Mi perfil
@@ -352,6 +355,55 @@ body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--blanco
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2rem;">
         <button class="btn btn-primary" id="btnGuardarProd" onclick="guardarProducto()">💾 Guardar producto</button>
         <button class="btn btn-outline" onclick="nav('productos')">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- MIS CATEGORÍAS -->
+    <div class="page" id="p-categorias">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div class="page-title">Mis categorías</div>
+          <div class="page-sub">Organiza tus productos con categorías propias de tu emprendimiento</div>
+        </div>
+        <button class="btn btn-primary" onclick="abrirModalCat()">+ Nueva categoría</button>
+      </div>
+      <div id="catListWrap">
+        <div style="color:rgba(250,250,246,0.3);padding:2rem;text-align:center">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- Modal categoría -->
+    <div class="modal-backdrop" id="catModalBd" style="display:none" onclick="if(event.target===this)cerrarModalCat()">
+      <div class="modal-box" style="max-width:420px">
+        <div class="modal-header">
+          <span id="catModalTitulo">Nueva categoría</span>
+          <button class="modal-close" onclick="cerrarModalCat()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;padding:1.5rem">
+          <div style="display:flex;gap:0.75rem;align-items:flex-end">
+            <div class="fg" style="width:70px;flex-shrink:0">
+              <label class="fl">Emoji</label>
+              <input class="fi" id="catEmoji" placeholder="🎁" maxlength="4" style="text-align:center;font-size:1.4rem;padding:0.4rem">
+            </div>
+            <div class="fg" style="flex:1">
+              <label class="fl">Nombre *</label>
+              <input class="fi" id="catNombre" placeholder="Ej: Regalos personalizados" oninput="autoSlugCat()">
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">Slug (identificador)</label>
+            <input class="fi" id="catSlug" placeholder="regalos_personalizados" oninput="catSlugManual=true">
+            <div style="font-size:0.72rem;color:rgba(250,250,246,0.35);margin-top:0.3rem">Solo letras, números y guiones bajos. Se genera automáticamente.</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Orden</label>
+            <input class="fi" id="catOrden" type="number" min="1" placeholder="1">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="cerrarModalCat()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarCategoria()">Guardar</button>
+        </div>
       </div>
     </div>
 
@@ -617,15 +669,24 @@ async function doReset() {
   volverLogin();
 }
 
-// ── Categorías dinámicas ───────────────────────────────────────────────────────
+// ── Categorías del emprendedor ─────────────────────────────────────────────────
+let _catEditId = null;
+let catSlugManual = false;
+
 async function cargarCategorias() {
-  const { data } = await sb.from('categorias_emprende').select('slug,nombre,emoji,activo').order('orden').order('nombre');
-  if (!data) return;
+  if (!emprendedor) return;
+  const { data } = await sb.from('categorias_emprendedor')
+    .select('id,slug,nombre,emoji,orden,activo')
+    .eq('emprendedor_id', emprendedor.id)
+    .order('orden').order('nombre');
+  const cats = data || [];
+
+  // Actualizar select del formulario de producto
   CAT = {};
   const sel = document.getElementById('fpCat');
   const prev = sel.value;
   sel.innerHTML = '<option value="">— Selecciona —</option>';
-  data.filter(c => c.activo).forEach(c => {
+  cats.filter(c => c.activo).forEach(c => {
     CAT[c.slug] = `${c.emoji} ${c.nombre}`.trim();
     const opt = document.createElement('option');
     opt.value = c.slug;
@@ -633,6 +694,87 @@ async function cargarCategorias() {
     sel.appendChild(opt);
   });
   if (prev) sel.value = prev;
+
+  // Renderizar tabla de gestión
+  const wrap = document.getElementById('catListWrap');
+  if (!wrap) return;
+  if (!cats.length) {
+    wrap.innerHTML = '<div style="color:rgba(250,250,246,0.35);padding:2rem;text-align:center">Aún no tienes categorías. Crea una para organizar tus productos.</div>';
+    return;
+  }
+  wrap.innerHTML = `<div class="tbl-wrap"><table class="tbl"><thead><tr>
+    <th>Emoji</th><th>Nombre</th><th>Slug</th><th>Orden</th><th>Estado</th><th>Acciones</th>
+  </tr></thead><tbody>${cats.map(c => `<tr>
+    <td style="font-size:1.4rem;text-align:center">${c.emoji||''}</td>
+    <td>${esc(c.nombre)}</td>
+    <td style="font-size:0.78rem;color:rgba(250,250,246,0.45)">${esc(c.slug)}</td>
+    <td style="text-align:center">${c.orden}</td>
+    <td><span class="badge ${c.activo?'badge-ok':'badge-off'}">${c.activo?'Activa':'Inactiva'}</span></td>
+    <td style="display:flex;gap:0.5rem">
+      <button class="btn btn-ghost btn-sm" onclick="abrirModalCat(${c.id})">Editar</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--rosa)" onclick="eliminarCategoria(${c.id},'${esc(c.nombre).replace(/'/g,"\\'")}')">Eliminar</button>
+    </td>
+  </tr>`).join('')}</tbody></table></div>`;
+}
+
+function abrirModalCat(id) {
+  _catEditId = id || null;
+  catSlugManual = false;
+  document.getElementById('catModalTitulo').textContent = id ? 'Editar categoría' : 'Nueva categoría';
+  document.getElementById('catNombre').value = '';
+  document.getElementById('catEmoji').value = '';
+  document.getElementById('catSlug').value = '';
+  document.getElementById('catOrden').value = '';
+  if (id) {
+    sb.from('categorias_emprendedor').select('*').eq('id', id).single().then(({ data: c }) => {
+      if (!c) return;
+      document.getElementById('catNombre').value = c.nombre;
+      document.getElementById('catEmoji').value = c.emoji || '';
+      document.getElementById('catSlug').value = c.slug;
+      document.getElementById('catOrden').value = c.orden;
+      catSlugManual = true;
+    });
+  }
+  document.getElementById('catModalBd').style.display = 'flex';
+  setTimeout(() => document.getElementById('catNombre').focus(), 50);
+}
+
+function cerrarModalCat() { document.getElementById('catModalBd').style.display = 'none'; }
+
+function autoSlugCat() {
+  if (catSlugManual) return;
+  const v = document.getElementById('catNombre').value
+    .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,40);
+  document.getElementById('catSlug').value = v;
+}
+
+async function guardarCategoria() {
+  const nombre = document.getElementById('catNombre').value.trim();
+  const emoji  = document.getElementById('catEmoji').value.trim();
+  const slug   = document.getElementById('catSlug').value.trim();
+  const orden  = parseInt(document.getElementById('catOrden').value) || 999;
+  if (!nombre) { toast('El nombre es obligatorio', 'err'); return; }
+  if (!slug || !/^[a-z0-9_-]+$/.test(slug)) { toast('Slug inválido (solo letras minúsculas, números y _ )', 'err'); return; }
+  const row = { emprendedor_id: emprendedor.id, nombre, emoji, slug, orden, activo: true };
+  let err;
+  if (_catEditId) {
+    ({ error: err } = await sb.from('categorias_emprendedor').update({ nombre, emoji, slug, orden }).eq('id', _catEditId));
+  } else {
+    ({ error: err } = await sb.from('categorias_emprendedor').insert(row));
+  }
+  if (err) { toast('Error: ' + err.message, 'err'); return; }
+  toast(_catEditId ? 'Categoría actualizada ✓' : 'Categoría creada ✓');
+  cerrarModalCat();
+  cargarCategorias();
+}
+
+async function eliminarCategoria(id, nombre) {
+  if (!confirm(`¿Eliminar la categoría "${nombre}"? Los productos no perderán su categoría pero no aparecerá en los filtros.`)) return;
+  const { error } = await sb.from('categorias_emprendedor').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message, 'err'); return; }
+  toast('Categoría eliminada');
+  cargarCategorias();
 }
 
 // ── Iniciar app ────────────────────────────────────────────────────────────────
@@ -1153,6 +1295,7 @@ function nav(page) {
   if (sbEl) sbEl.classList.add('active');
   if (page === 'nuevo') nuevoProductoForm();
   if (page === 'perfil') cargarFormPerfil();
+  if (page === 'categorias') cargarCategorias();
   window.scrollTo(0,0);
 }
 </script>
