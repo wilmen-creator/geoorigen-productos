@@ -147,6 +147,21 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 .modal-cta{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.25rem;}
 .btn-wa{display:inline-flex;align-items:center;gap:0.5rem;background:#25D366;border:none;border-radius:5px;padding:0.72rem 1.4rem;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;transition:background .2s;text-decoration:none;}
 .btn-wa:hover{background:#1dbd5a;}
+/* Lotes en venta */
+.lote-est{position:absolute;top:0.7rem;right:0.7rem;font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:20px;padding:0.22rem 0.65rem;color:#10200a;}
+.lote-est.disponible{background:#4CB050;}.lote-est.reservado{background:#E8A020;}
+.lote-360{position:absolute;bottom:0.7rem;left:0.7rem;font-size:0.65rem;font-weight:600;background:rgba(26,26,20,0.85);border:1px solid rgba(143,188,90,0.45);border-radius:20px;padding:0.2rem 0.6rem;color:var(--menta);}
+.lote-meta{display:flex;gap:0.8rem;flex-wrap:wrap;font-size:0.8rem;color:rgba(250,250,246,0.6);margin-bottom:0.75rem;}
+.lote-acc{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.lote-acc a{flex:1;justify-content:center;padding:0.55rem 0.8rem;font-size:0.78rem;}
+.btn-360{display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--menta);border-radius:5px;color:var(--menta);text-decoration:none;font-family:'DM Sans',sans-serif;font-weight:500;}
+.btn-360:hover{background:rgba(143,188,90,0.12);}
+.lote-pu{font-size:0.75rem;color:rgba(250,250,246,0.45);}
+.lote-etq{display:flex;flex-wrap:wrap;gap:0.35rem;margin:-0.25rem 0 0.8rem;}
+.lote-etq span{font-size:0.7rem;background:rgba(143,188,90,0.12);border:1px solid rgba(143,188,90,0.28);color:#dfe9d3;border-radius:12px;padding:0.15rem 0.55rem;}
+.btn-share{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:42px;border:1px solid var(--borde);border-radius:5px;background:transparent;color:rgba(250,250,246,0.7);cursor:pointer;}
+.btn-share:hover{border-color:var(--menta);color:var(--menta);}
+.lotes-aviso{font-size:0.74rem;color:rgba(250,250,246,0.4);border:1px dashed rgba(250,250,246,0.15);border-radius:8px;padding:0.6rem 0.9rem;margin:-0.75rem 0 1.25rem;}
 .btn-sec{display:inline-flex;align-items:center;gap:0.4rem;background:transparent;border:1px solid var(--borde);border-radius:5px;padding:0.72rem 1.25rem;color:rgba(250,250,246,0.6);font-family:'DM Sans',sans-serif;font-size:0.84rem;cursor:pointer;transition:all .2s;text-decoration:none;}
 .btn-sec:hover{border-color:rgba(143,188,90,0.4);color:var(--menta);}
 
@@ -209,6 +224,7 @@ footer{background:var(--gris);border-top:1px solid var(--borde);padding:2rem 2.5
     <div class="sec-tabs">
       <button class="sec-tab active" id="tabCampo" onclick="setSection('campo')">🌿 Del Campo</button>
       <button class="sec-tab" id="tabEmprende" onclick="setSection('emprende')">✨ Emprendedores</button>
+      <button class="sec-tab" id="tabLotes" onclick="setSection('lotes')">🏡 Lotes en venta</button>
     </div>
     <div class="cat-tabs" id="catTabs"></div>
   </div>
@@ -226,6 +242,7 @@ footer{background:var(--gris);border-top:1px solid var(--borde);padding:2rem 2.5
     </select>
   </div>
   <div class="results-info" id="resultsInfo">&nbsp;</div>
+  <div class="lotes-aviso" id="lotesAviso" style="display:none">GeoOrigen solo publica estos lotes. La negociación es directamente con el propietario por WhatsApp.</div>
   <div class="grid" id="grid">
     <div class="skeleton"></div><div class="skeleton"></div>
     <div class="skeleton"></div><div class="skeleton"></div>
@@ -302,8 +319,143 @@ async function cargar() {
       }
     }
   } catch(e) { campoProd = []; emprendeProd = []; emprendedoresList = []; }
+  await cargarLotes();
+  if (new URLSearchParams(location.search).get('seccion') === 'lotes') { setSection('lotes'); return; }
   buildCatTabs();
   filtrar();
+}
+
+// ── Lotes en venta ────────────────────────────────────────────────────────────
+// Salen del recorrido 360° de cada finca (linderos con estado y puntos de lote, editor del admin).
+// Solo fincas activas con "Publicar lotes en Emprende" vigente (fincas.lotes_hasta). No se muestran vendidos.
+let lotesList = [];
+const EST_TXT = { disponible: 'Disponible', reservado: 'Reservado' };
+// Mismas características y cálculo de precio por área que tour360.js
+const ETQ = { agua: '💧 Agua', luz: '⚡ Luz', via: '🛣️ Vía de acceso', internet: '📶 Internet', rio: '🏞️ Río o quebrada',
+  plano: '🟩 Terreno plano', escritura: '📄 Escritura al día', cuotas: '💳 Facilidad de pago', permuta: '🔁 Recibe permuta' };
+function _m2(area) {
+  const t = String(area || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const m = t.match(/^([\d.,]+)\s*(ha|hect[aá]reas?|hectareas?|m2|m²|mts2?|metros?(?: cuadrados)?|fanegadas?)?\b/);
+  if (!m) return NaN;
+  let n = m[1];
+  n = /^\d{1,3}(\.\d{3})+(,\d+)?$/.test(n) ? n.replace(/\./g, '').replace(',', '.') : n.replace(',', '.');
+  const v = parseFloat(n), u = m[2] || 'm2';
+  if (!isFinite(v) || v <= 0) return NaN;
+  return /^h/.test(u) ? v * 10000 : /^f/.test(u) ? v * 6400 : v;
+}
+function _pesosN(precio) {
+  const t = String(precio || '').toLowerCase().replace(/\s+/g, '');
+  const mm = t.match(/^\$?([\d.,]+)(millones|millon|mill|m)$/);
+  if (mm) { const x = parseFloat(mm[1].replace(/\./g, '').replace(',', '.')); return isFinite(x) ? x * 1e6 : NaN; }
+  const d = t.replace(/^\$/, '').replace(/[.,](?=\d{3}(\D|$))/g, '');
+  return /^\d+$/.test(d) ? Number(d) : NaN;
+}
+function _pesos(n) { return '$' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function precioUnidad(area, precio) {
+  const a = _m2(area), v = _pesosN(precio);
+  if (!isFinite(a) || !isFinite(v) || v < 1000) return '';
+  return a >= 10000 ? '≈ ' + _pesos(v / a * 10000) + '/ha' : '≈ ' + _pesos(v / a) + '/m²';
+}
+function _num(v) { return v === null || v === undefined || v === '' ? NaN : Number(v); }
+function _lista(v) { if (Array.isArray(v)) return v; if (typeof v === 'string') { try { const a = JSON.parse(v); return Array.isArray(a) ? a : []; } catch (e) {} } return []; }
+function _dentro(p, poly) {   // mismo cálculo que tour360.js (yaw que cruza los 180° incluido)
+  const y0 = poly[0][1], uw = (y) => { let d = y - y0; while (d > 180) d -= 360; while (d < -180) d += 360; return y0 + d; };
+  const x = uw(p[1]), y = p[0]; let ins = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = uw(poly[i][1]), yi = poly[i][0], xj = uw(poly[j][1]), yj = poly[j][0];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
+function lotesDeFinca(f) {
+  const out = [];
+  _lista(f.tours_360).forEach(tour => {
+    const hs = _lista(tour.hotspots).filter(h => h && isFinite(_num(h.pitch)) && isFinite(_num(h.yaw)));
+    const lotes = hs.filter(h => h.tipo === 'lote'), escenas = hs.filter(h => h.tipo === 'escena' && h.destino);
+    const usados = new Set();
+    const base = (id, nombre, estado, lote, con360, portada) => ({
+      id: String(id), nombre: nombre || 'Lote', estado, escena: String(tour.id), con360,
+      area: lote && lote.area || '', precio: lote && lote.precio || '',
+      imagen: [lote && lote.imagen, portada].find(u => /^https:\/\//i.test(u || '')) || '',
+      etiquetas: (lote && Array.isArray(lote.etiquetas) ? lote.etiquetas : []).filter(k => ETQ[k]), distancia: lote && lote.distancia || '',
+      finca: f.nombre || '', slug: f.slug, vereda: f.vereda || '', municipio: f.municipio || '', departamento: f.departamento || '', whatsapp: f.whatsapp || ''
+    });
+    _lista(tour.trazos).forEach(t => {
+      if ((t.tipo || 'area') !== 'area') return;
+      const pts = (t.puntos || []).filter(q => q && isFinite(_num(q[0])) && isFinite(_num(q[1])));
+      if (pts.length < 3) return;
+      const lote = lotes.find(h => _dentro([+h.pitch, +h.yaw], pts));
+      if (lote) usados.add(String(lote.id));
+      const estado = EST_TXT[t.estado] ? t.estado : (t.estado === 'vendido' ? '' : lote && EST_TXT[lote.estado] ? lote.estado : '');
+      if (!estado) return;
+      out.push(base(t.id, t.nombre || (lote && lote.titulo), estado, lote, escenas.some(h => _dentro([+h.pitch, +h.yaw], pts)), t.portada));
+    });
+    lotes.forEach(h => {   // puntos de lote sueltos (sin lindero dibujado)
+      if (usados.has(String(h.id)) || !EST_TXT[h.estado]) return;
+      out.push(base(h.id, h.titulo, h.estado, h, false));
+    });
+  });
+  return out;
+}
+async function cargarLotes() {
+  try {
+    const hoy = new Date(); const d = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+    const r = await fetch(SUPA_URL + '/rest/v1/fincas?activa=eq.true&lotes_hasta=gte.' + d +
+      '&select=slug,nombre,vereda,municipio,departamento,whatsapp,tours_360(id,titulo,hotspots,trazos)', { headers: H });
+    const fincas = r.ok ? await r.json() : [];
+    lotesList = fincas.flatMap(lotesDeFinca);
+    lotesList.sort((a, b) => (a.estado === b.estado ? 0 : a.estado === 'disponible' ? -1 : 1) || a.finca.localeCompare(b.finca) || a.nombre.localeCompare(b.nombre, 'es', { numeric: true }));
+  } catch (e) { lotesList = []; }
+}
+function _precio(p) { p = String(p || '').trim(); return /^\d{4,}$/.test(p) ? '$' + p.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : p; }
+// Enlace para compartir: muestra foto, nombre, precio y estado en la vista previa de WhatsApp y redes
+function linkCompartir(l) { return 'https://geoorigen.com/lote?f=' + encodeURIComponent(l.slug) + '&e=' + encodeURIComponent(l.escena) + '&l=' + encodeURIComponent(l.id); }
+function compartirLote(i) {
+  const l = _lotesVista[i]; if (!l) return;
+  const url = linkCompartir(l), tit = l.nombre + ' · finca ' + l.finca;
+  if (navigator.share) { navigator.share({ title: tit, text: tit + ' en venta', url }).catch(() => {}); return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(() => alert('Enlace del lote copiado'), () => prompt('Copia el enlace:', url));
+  else prompt('Copia el enlace:', url);
+}
+let _lotesVista = [];
+function linkLote(l) { return 'https://geoorigen.com/finca?finca=' + encodeURIComponent(l.slug) + '&escena=' + encodeURIComponent(l.escena) + '&lote=' + encodeURIComponent(l.id); }
+function waLote(l) {
+  const n = String(l.whatsapp || '').replace(/\D/g, '');
+  if (n.length < 10 || n.length > 15) return '';
+  return 'https://wa.me/' + n + '?text=' + encodeURIComponent('Hola, vengo de GeoOrigen Emprende y me interesa ' + l.nombre + ' de la finca ' + l.finca + '. ' + linkCompartir(l));
+}
+function iconShare() { return `<svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>`; }
+function iconPano() { return `<svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>`; }
+function renderLotes(lista) {
+  const grid = document.getElementById('grid');
+  const info = document.getElementById('resultsInfo');
+  info.innerHTML = `<span>${lista.length}</span> lote${lista.length!==1?'s':''} en venta`;
+  if (!lista.length) { grid.innerHTML = `<div class="empty"><svg width="56" height="56" viewBox="0 0 24 24" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><p>No hay lotes publicados por ahora.</p><small>Pronto habrá más lotes en venta.</small></div>`; return; }
+  _lotesVista = lista;
+  grid.innerHTML = lista.map((l, i) => {
+    const wa = waLote(l), lugar = [l.vereda, l.municipio].filter(Boolean).join(' · '), pu = precioUnidad(l.area, l.precio);
+    const chips = [l.distancia && '📍 ' + l.distancia, ...l.etiquetas.map(k => ETQ[k])].filter(Boolean);
+    return `<div class="card" data-href="${esc(linkLote(l))}" onclick="location.href=this.dataset.href">
+      <div class="card-thumb">
+        ${l.imagen ? `<img src="${esc(l.imagen)}" alt="${esc(l.nombre)}" loading="lazy">` : thumbPH()}
+        <div class="card-thumb-ov"></div>
+        <div class="card-cat">${esc(l.finca)}</div>
+        <div class="lote-est ${esc(l.estado)}">${esc(EST_TXT[l.estado])}</div>
+        <div class="lote-360">${iconPano()} Ver en 360°</div>
+      </div>
+      <div class="card-body">
+        <div class="card-nombre">${esc(l.nombre)}</div>
+        ${lugar ? `<div class="card-prod">${iconHome()} ${esc(lugar)}</div>` : ''}
+        <div class="lote-meta">${l.area ? `<span>📐 ${esc(l.area)}</span>` : ''}${l.precio ? `<span class="card-precio" style="margin:0">${esc(_precio(l.precio))}</span>` : ''}${pu ? `<span class="lote-pu">${esc(pu)}</span>` : ''}</div>
+        ${chips.length ? `<div class="lote-etq">${chips.slice(0, 5).map(c => `<span>${esc(c)}</span>`).join('')}${chips.length > 5 ? `<span>+${chips.length - 5}</span>` : ''}</div>` : ''}
+        <div class="lote-acc" onclick="event.stopPropagation()">
+          <a class="btn-360" href="${esc(linkLote(l))}">${iconPano()} Ver lote</a>
+          ${wa ? `<a class="btn-wa" href="${esc(wa)}" target="_blank" rel="noopener">${iconWA()} Me interesa</a>` : ''}
+          <button class="btn-share" type="button" onclick="compartirLote(${i})" aria-label="Compartir lote" title="Compartir">${iconShare()}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── Sección ────────────────────────────────────────────────────────────────────
@@ -312,11 +464,14 @@ function setSection(s) {
   catActual = 'todos';
   document.getElementById('searchInput').value = '';
   document.getElementById('depFilter').value = '';
-  document.getElementById('depFilter').style.display = s === 'campo' ? '' : 'none';
-  document.getElementById('catTabs').style.display = s === 'campo' ? '' : 'none';
+  document.getElementById('depFilter').style.display = s === 'emprende' ? 'none' : '';
+  document.getElementById('catTabs').style.display = s === 'emprende' ? 'none' : '';
   document.getElementById('tabCampo').classList.toggle('active', s === 'campo');
   document.getElementById('tabEmprende').classList.toggle('active', s === 'emprende');
-  document.getElementById('searchInput').placeholder = s === 'campo' ? 'Buscar por nombre…' : 'Buscar emprendimiento…';
+  document.getElementById('tabLotes').classList.toggle('active', s === 'lotes');
+  document.getElementById('lotesAviso').style.display = s === 'lotes' ? '' : 'none';
+  document.getElementById('searchInput').placeholder = s === 'campo' ? 'Buscar por nombre…' : s === 'lotes' ? 'Buscar por finca, vereda o municipio…' : 'Buscar emprendimiento…';
+  try { history.replaceState(null, '', s === 'lotes' ? '?seccion=lotes' : location.pathname); } catch (e) {}
   document.getElementById('grid').classList.toggle('emp-grid', s === 'emprende');
   buildCatTabs();
   filtrar();
@@ -326,6 +481,11 @@ function setSection(s) {
 function buildCatTabs() {
   if (seccion === 'emprende') return; // las cards de emprendedor no usan categorías
   const container = document.getElementById('catTabs');
+  if (seccion === 'lotes') {
+    container.innerHTML = [['todos','Todos'],['disponible','Disponibles'],['reservado','Reservados']].map(([k,t]) =>
+      `<button class="cat-tab${k==='todos'?' active':''}" onclick="setCat('${k}',this)">${t}</button>`).join('');
+    return;
+  }
   let btns = [`<button class="cat-tab active" onclick="setCat('todos',this)">Todos</button>`];
   const cats = [...new Set(campoProd.map(p => p.categoria).filter(Boolean))];
   cats.sort((a,b) => { const ia=CAT_CAMPO_ORDER.indexOf(a),ib=CAT_CAMPO_ORDER.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib); });
@@ -344,6 +504,16 @@ function setCat(cat, btn) {
 function filtrar() {
   const q   = (document.getElementById('searchInput').value || '').toLowerCase();
   const dep = document.getElementById('depFilter').value;
+  if (seccion === 'lotes') {
+    const lista = lotesList.filter(l => {
+      if (catActual !== 'todos' && l.estado !== catActual) return false;
+      if (dep && l.departamento !== dep) return false;
+      if (q) { const hay = [l.nombre, l.finca, l.vereda, l.municipio].filter(Boolean).join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
+      return true;
+    });
+    renderLotes(lista);
+    return;
+  }
   if (seccion === 'campo') {
     const lista = campoProd.filter(p => {
       if (catActual !== 'todos' && p.categoria !== catActual) return false;
